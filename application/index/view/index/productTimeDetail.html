@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>产品交期详情</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+<div class="container productTimeDetail" id="app" v-cloak>
+
+    <div class="list">
+        <div class="item">
+            <span class="left">客户名称</span>
+            <span class="right">{{detail.A_khmc}}</span>
+        </div>
+        <div class="item">
+            <span class="left">销售人员</span>
+            <span class="right">{{detail.B_ywy}}</span>
+        </div>
+        <div class="item">
+            <span class="left">工程案号</span>
+            <span class="right">{{detail.C_gcah}}</span>
+        </div>
+        <div class="item">
+            <span class="left">单号</span>
+            <span class="right">{{detail.D_dh}}</span>
+        </div>
+        <div class="item">
+            <span class="left">品号</span>
+            <span class="right">{{detail.E_ph}}</span>
+        </div>
+        <div class="item">
+            <span class="left">品名</span>
+            <span class="right">{{detail.F_pm}}</span>
+        </div>
+        <div class="item">
+            <span class="left">货品规格</span>
+            <span class="right">{{detail.G_hpgg}}</span>
+        </div>
+        <div class="item">
+            <span class="left">单位</span>
+            <span class="right">{{detail.H_dw}}</span>
+        </div>
+        <div class="item">
+            <span class="left">出库日期</span>
+            <span class="right">{{detail.I_ckrq}}</span>
+        </div>
+        <div class="item">
+            <span class="left">数量</span>
+            <span class="right">{{detail.J_sl}}</span>
+        </div>
+        <div class="item">
+            <span class="left">销货数量</span>
+            <span class="right">{{detail.K_xhsl}}</span>
+        </div>
+        <div class="item">
+            <span class="left">未转销货数量</span>
+            <span class="right">{{detail.L_wzxhsl}}</span>
+        </div>
+        <div class="item">
+            <span class="left">审核人名称</span>
+            <span class="right">{{detail.M_shrmc}}</span>
+        </div>
+        <div class="item">
+            <span class="left">预计发货日期</span>
+            <span class="right">{{detail.N_yjfhrq}}</span>
+        </div>
+        <div class="item-wrap">
+            <div class="top">备注</div>
+            <div class="bottom">{{detail.O_bz}}</div>
+        </div>
+    </div>
+
+    <!--<div class="btn-error-box">-->
+        <!--<div class="btn-error" @click="correctError">我要纠错</div>-->
+    <!--</div>-->
+</div>
+
+<script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+<script src="/static/js/dingding.js"></script>
+<script src="/static/js/util.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            userInfo: {},
+            detail: {}
+        },
+        methods: {
+            correctError: function () {
+                var self = this;
+                ding.prompt(function (resp) {
+                    if (resp.buttonIndex == 0) {
+
+                        if (!resp.value) {
+                            ding.toast('请输入纠错信息')
+                            return;
+                        }
+
+                        axios.get('/api/product_delivery/correctError', {
+                            params: {
+                                id: util.getParams('id'),
+                                userId: self.userInfo.userid,
+                                userName: self.userInfo.name,
+                                content: resp.value
+                            }
+                        }).then(function (resp) {
+                            if (resp.data.ret) {
+                                ding.toast('纠错信息提交成功')
+                            }else{
+                                ding.toast(resp.data.msg);
+                            }
+                        })
+                    }
+                }, '请输入纠错信息')
+            },
+            getData: function () {
+                var self = this;
+                ding.showLoading();
+                axios.get('/api/product_delivery/getInfo', {
+                    params: {
+                        id: util.getParams('id')
+                    }
+                }).then(function (resp) {
+                    console.log(resp.data.data)
+                    ding.hideLoading();
+                    self.detail = resp.data.data;
+                })
+            }
+        },
+        created: function () {
+            var self = this;
+
+            ding.ready(function () {
+                ding.getUserInfo(function (resp) {
+                    self.userInfo = resp.data;
+                    self.getData();
+                });
+            });
+        }
+    });
+
+</script>
+</body>
+</html>

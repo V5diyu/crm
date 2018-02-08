@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>沟通记录</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <style>
+        .record-list .record-item{
+            display: block;
+            color: #000;
+            height: 50px;
+            line-height: 50px;
+            background-color: #ffffff;
+            border-top: 1px solid #e8e8e8;
+            padding: 0 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container productTime nav-fixed-bottom" id="app" v-cloak>
+
+        <div class="record-list">
+            <a href="/index/index/customerRecord" class="record-item">客户</a>
+            <a href="/index/index/agentRecord" class="record-item">代理商</a>
+        </div>
+
+        <div class="nav" v-if="userInfo.userid">
+            <a class="nav-item" href="/index/index">
+                <i class="iconfont icon-gongzuotai1"></i>
+                <p>工作台</p>
+            </a>
+            <a class="nav-item" href="/index/index/customer">
+                <i class="iconfont icon-category"></i>
+                <p>客户</p>
+            </a>
+            <a class="nav-item" href="/index/index/agent">
+                <i class="iconfont icon-dailishangguanli"></i>
+                <p>代理商</p>
+            </a>
+            <a v-if="userInfo.roleName === '主管'" href="/index/index/managerRecord" class="nav-item nav-active">
+                <i class="iconfont icon-chanpin"></i>
+                <p>沟通记录</p>
+            </a>
+        </div>
+    </div>
+
+    <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+    <script src="/static/js/dingding.js"></script>
+    <script src="/static/js/util.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                isNoData: false,
+                userInfo: {},
+                pn: 1,
+                listData: [],
+                isHasNext: true,
+                isLoading: false
+            },
+            methods: {
+                getData: function(){
+                    var self = this;
+                    ding.showLoading();
+
+                    axios.get('/api/customer/getRecordList', {
+                        params: {
+                            pn: self.pn
+                        }
+                    }).then(function (resp) {
+                        ding.hideLoading();
+                        if (resp.data.data.length < 15) {
+                            self.isHasNext = false;
+                        }
+                        self.listData = self.listData.concat(resp.data.data);
+
+                        if (self.listData.length == 0) {
+                            self.isNoData = true;
+                        }
+                    })
+                }
+            },
+            created: function(){
+                var self = this;
+
+                ding.ready(function(){
+                    ding.getUserInfo(function(resp){
+                        self.userInfo = resp.data;
+                        self.getData();
+                    });
+                });
+
+                this.$nextTick(function(){
+                    util.loadMore(function(){
+                        if (!self.isHasNext) {
+                            ding.toast('没有更多数据', 2);
+                            return;
+                        }
+                        if (self.isLoading) {
+                            return;
+                        }
+                        self.pn += 1;
+                        self.getData();
+                    })
+                })
+            }
+        })
+
+    </script>
+</body>
+</html>

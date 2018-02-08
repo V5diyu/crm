@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>代理商详情</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+    <div class="container addCustomer" id="app">
+
+        <div class="customerType">
+            <span class="txt">代理商类型</span>
+            <div class="customerType-box">
+                <span class="type" :class="{'type-active': form.type == 1}" @click="switchType(1)">代理商</span>
+                <span class="type" :class="{'type-active': form.type == 2}" @click="switchType(2)">代理人</span>
+            </div>
+        </div>
+
+        <!-- 代理商信息 -->
+        <div class="baseinfo" v-show="form.type == 1">
+            <div class="title">代理商信息</div>
+            <div class="list">
+                <div class="item">
+                    <span class="txt">名称</span>
+                    <input type="text" v-model="form.name">
+                </div>
+                <div class="item">
+                    <span class="txt">编号</span>
+                    <input type="text" v-model="form.code">
+                </div>
+                <div class="item">
+                    <span class="txt">简称</span>
+                    <input type="text" v-model="form.abbreviation">
+                </div>
+                <div class="item">
+                    <span class="txt">法定代表人</span>
+                    <input type="text" v-model="form.legalRepresentative">
+                </div>
+                <div class="item">
+                    <span class="txt">地址</span>
+                    <input type="text" v-model="form.address">
+                </div>
+                <div class="item">
+                    <span class="txt">注册资金/万</span>
+                    <input type="number" v-model="form.registeredCapital">
+                </div>
+                <div class="item">
+                    <span class="txt">去年年销售额</span>
+                    <input type="number" v-model="form.lastYearSales">
+                </div>
+                <div class="item">
+                    <span class="txt">代理级别</span>
+                    <input type="text" v-model="form.proxyLevel">
+                </div>
+                <div class="item">
+                    <span class="txt">其他情况说明</span>
+                    <input type="text" v-model="form.explain">
+                </div>
+                <div class="item">
+                    <span class="txt">跟进销售人员</span>
+                    <input type="text" v-model="form.belongUserName">
+                </div>
+            </div>
+        </div>
+
+        <!-- 代理人信息 -->
+        <div class="baseinfo" v-show="form.type == 2">
+            <div class="title">代理人信息</div>
+            <div class="list">
+                <div class="item">
+                    <span class="txt">名称</span>
+                    <input type="text" v-model="form.name">
+                </div>
+                <div class="item">
+                    <span class="txt">编号</span>
+                    <input type="text" v-model="form.code">
+                </div>
+                <div class="item">
+                    <span class="txt">其他情况说明</span>
+                    <input type="text" v-model="form.explain">
+                </div>
+                <div class="item">
+                    <span class="txt">跟进销售人员</span>
+                    <input type="text" v-model="form.belongUserName">
+                </div>
+            </div>
+        </div>
+
+        <!-- 主要人员 -->
+        <div class="baseinfo" v-show="form.type == 1">
+            <div class="title">主要人员</div>
+            <div class="list">
+                <div v-for="(item, index) in form.mainPersonnel">
+                    <div class="item">
+                        <span class="txt">姓名</span>
+                        <input type="text" v-model="item.name">
+                    </div>
+                    <div class="item">
+                        <span class="txt">职务</span>
+                        <input type="text" v-model="item.duties">
+                    </div>
+                    <div class="item">
+                        <span class="txt">电话</span>
+                        <input type="number" v-model="item.phone">
+                    </div>
+                    <div class="item">
+                        <span class="txt">人员备注</span>
+                        <input type="text" v-model="item.remarks">
+                    </div>
+
+                    <div class="line"></div>
+                </div>
+                <div class="btn-add-box">
+                    <div class="btn-add" @click="addMainPersonnel">添加主要人员</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-save-box">
+            <div class="btn-save" @click="submit">提交</div>
+        </div>
+    </div>
+
+    <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+    <script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+    <script src="/static/js/dingding.js"></script>
+    <script src="/static/js/util.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                userInfo: {},
+                form: {
+                    type: 1,
+                    userId: '',          //dingding userId
+                    code: '',            //代理商代码
+                    name: '',             //代理商名称
+                    abbreviation: '',     //代理商简称
+                    legalRepresentative: '', //法定代表人
+                    address: '',             //地址
+                    registeredCapital: '',   //注册资金
+                    lastYearSales: '',     //去年贡献收入
+                    proxyLevel: '',          //代理级别  1 2 3
+                    belongUserName: '',         //跟进销售员
+                    explain: '',            //其他情况说明
+                    mainPersonnel: [{}]     //主要人员{'duties':'','name':'','phone':'','remarks':''}
+                }
+            },
+            methods: {
+                initData: function(val){
+                    this.form = {
+                        type: val,
+                        userId: '',          //dingding userId
+                        code: '',            //代理商代码
+                        name: '',             //代理商名称
+                        abbreviation: '',     //代理商简称
+                        legalRepresentative: '', //法定代表人
+                        address: '',             //地址
+                        registeredCapital: '',   //注册资金
+                        lastYearSales: '',     //去年贡献收入
+                        proxyLevel: '',          //代理级别  1 2 3
+                        belongUserName: '',         //跟进销售员
+                        explain: '',            //其他情况说明
+                        mainPersonnel: [{}]     //主要人员{'duties':'','name':'','phone':'','remarks':''}
+                    }
+                },
+                switchType: function (val) {
+                    ding.toast('不能修改代理商类型');
+                },
+                // 新增主要人员
+                addMainPersonnel: function(){
+                    this.form.mainPersonnel.push({})
+                },
+                submit: function () {
+                    this.form.userId = this.userInfo.userid;
+                    var self = this;
+
+                    if (!self.form.name) {
+                        ding.toast('请输入代理商名称');
+                        return;
+                    }
+
+                    if (!self.form.belongUserName) {
+                        ding.toast('请输入跟进销售人员');
+                        return;
+                    }
+
+                    ajax.post('/api/agent/update', self.form, function (resp) {
+                        ding.toast('修改成功');
+                        self.initData(self.form.type);
+                        setTimeout(function(){
+                            history.back();
+                        }, 2000)
+                    })
+                },
+                getData: function(){
+                    var self = this;
+                    ajax.post('/api/agent/getInfo', {
+                        id: util.getParams('id')
+                    }, function (resp) {
+                        self.form = resp.data;
+                    })
+                }
+            },
+            created: function(){
+                var self = this;
+                ding.ready(function(){
+                    ding.getUserInfo(function(resp){
+                        self.userInfo = resp.data;
+                        self.getData();
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

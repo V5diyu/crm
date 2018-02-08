@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>添加销售漏斗</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+<div class="container addCustomer" id="app">
+
+    <div class="baseinfo">
+        <div class="list">
+            <div class="item">
+                <span class="txt">阶段</span>
+                <input type="text" v-model="form.stage">
+            </div>
+            <div class="item">
+                <span class="txt">时间</span>
+                <div class="dateinput">
+                    <div style="flex: 1;height: .34rem;" @click="datepicker" v-text="form.time"></div>
+                    <i class="iconfont icon-calendar" style="margin-right: 10px" @click="datepicker"></i>
+                </div>
+            </div>
+            <div class="item">
+                <span class="txt">备注</span>
+                <input type="text" v-model="form.remarks">
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-save-box">
+        <div class="btn-save" @click="submit">提交</div>
+    </div>
+</div>
+
+<script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+<script src="/static/js/dingding.js"></script>
+<script src="/static/js/util.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            userInfo: null,
+            form: {
+                id: util.getParams('id'),
+                stage: '',
+                time: '',
+                remarks: '',
+                status: 1
+            }
+        },
+        methods: {
+            initData: function(){
+                this.form = {
+                    id: util.getParams('id'),
+                    stage: '',
+                    time: '',
+                    remarks: '',
+                    status: 1
+                }
+            },
+            datepicker: function () {
+                var self = this;
+                ding.datepicker(function(resp){
+                    self.form.time = resp.value;
+                })
+            },
+            submit: function () {
+//                this.form.userId = this.userInfo.userid;
+                var self = this;
+                ajax.post('/api/customer/createSalesFunnel', self.form, function (resp) {
+                    self.initData();
+                    ding.toast('添加成功');
+                    setTimeout(function(){
+                        history.back();
+                    }, 2000)
+                })
+            }
+        },
+        created: function(){
+            var self = this;
+            ding.ready(function(){
+                ding.getUserInfo(function(resp){
+                    self.userInfo = resp.data;
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>

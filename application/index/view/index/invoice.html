@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>销项发票</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+    <div class="container productTime" id="app" v-cloak>
+        <div class="search">
+            <div class="search-box">
+                <input type="text" v-model="keyword">
+                <i class="iconfont icon-sousuo" @click="search"></i>
+            </div>
+        </div>
+
+        <div class="list">
+            <a class="item" href="javascript:;" v-for="(item, index) in listData">
+                <!--<div class="title">-->
+                    <!--<span class="left">{{item.D_khdw}}</span>-->
+                    <!--<span class="right">{{item.sqsj}}</span>-->
+                <!--</div>-->
+                <div class="content">
+                    <div class="row">
+                        <span class="row-left">客户名称</span>
+                        <span class="row-right">{{item.khmc}}</span>
+                    </div>
+                    <div class="row">
+                        <span class="row-left">发票类型</span>
+                        <span class="row-right">{{item.fplx}}</span>
+                    </div>
+                    <div class="row">
+                        <span class="row-left">申请时间</span>
+                        <span class="row-right">{{item.sqsj}}</span>
+                    </div>
+                    <!--<div class="row">-->
+                        <!--<span class="row-left">状态</span>-->
+                        <!--<span class="row-right">{{item.status}}</span>-->
+                    <!--</div>-->
+                </div>
+            </a>
+
+        </div>
+
+        <div class="no-data" v-show="isNoData">暂无数据</div>
+
+        <a href="/index/index/invoiceOrder" class="btn-add-icon">+</a>
+    </div>
+
+
+    <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+    <script src="/static/js/dingding.js"></script>
+    <script src="/static/js/util.js"></script>
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                isNoData: false,
+                userInfo: {},
+                keyword: '',
+                pn: 1,
+                listData: [],
+                isHasNext: true,
+                isLoading: false
+            },
+            methods: {
+                search: function(){
+                    this.pn = 1;
+                    this.isHasNext = true;
+                    this.isLoading = false;
+                    this.listData = [];
+                    this.getData();
+                },
+                getData: function(){
+                    var self = this;
+                    ding.showLoading();
+                    axios.get('/api/invoice/get', {
+                        params: {
+                            userId: self.userInfo.userid,
+                            khmc: self.keyword,
+                            pn: self.pn
+                        }
+                    }).then(function (resp) {
+                        console.log(resp.data.data)
+                        ding.hideLoading();
+                        if (resp.data.data.length < 15) {
+                            self.isHasNext = false;
+                        }
+                        self.listData = self.listData.concat(resp.data.data);
+                        if (self.listData.length == 0) {
+                            self.isNoData = true;
+                        }
+                    })
+                }
+            },
+            created: function(){
+                var self = this;
+
+                ding.ready(function(){
+                    ding.getUserInfo(function(resp){
+                        self.userInfo = resp.data;
+                        self.getData();
+                    });
+                });
+
+                this.$nextTick(function(){
+                    util.loadMore(function(){
+                        if (!self.isHasNext) {
+                            ding.toast('没有更多数据', 2);
+                            return;
+                        }
+                        if (self.isLoading) {
+                            return;
+                        }
+                        self.pn += 1;
+                        self.getData();
+                    })
+                })
+            }
+        })
+    </script>
+</body>
+</html>

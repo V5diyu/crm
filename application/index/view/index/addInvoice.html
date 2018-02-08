@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>添加销项发票</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+    <div class="container addCustomer" id="app">
+
+        <div class="baseinfo">
+            <div class="title">申请信息</div>
+            <div class="list">
+                <div class="item">
+                    <span class="txt">申请人</span>
+                    <input type="text" v-model="form.sqr">
+                </div>
+                <div class="item">
+                    <span class="txt">订单编号</span>
+                    <input type="text" v-model="form.ddbh">
+                </div>
+                <div class="item">
+                    <span class="txt">客户名称</span>
+                    <input type="text" v-model="form.khmc">
+                </div>
+                <div class="item">
+                    <span class="txt">一般纳税人</span>
+                    <select v-model="form.ybnsr">
+                        <option value="">请选择</option>
+                        <option value="初次开票">初次开票</option>
+                        <option value="非初次开票">非初次开票</option>
+                    </select>
+                </div>
+                <div class="item">
+                    <span class="txt">额度类型</span>
+                    <select v-model="form.edlx">
+                        <option value="">请选择</option>
+                        <option value="全额开票">全额开票</option>
+                        <option value="部分开票">部分开票</option>
+                    </select>
+                </div>
+                <div class="item">
+                    <span class="txt">订单金额</span>
+                    <input type="number" v-model="form.ddje">
+                </div>
+                <div class="item">
+                    <span class="txt">付款情况</span>
+                    <select v-model="form.fkqk">
+                        <option value="">请选择</option>
+                        <option value="已付全款">已付全款</option>
+                        <option value="预付款">预付款</option>
+                        <option value="未付款">未付款</option>
+                    </select>
+                </div>
+                <div class="item">
+                    <span class="txt">出纳复核</span>
+                    <input type="text" v-model="form.cnfh">
+                </div>
+                <div class="item">
+                    <span class="txt">发货情况</span>
+                    <select v-model="form.fhqk">
+                        <option value="">请选择</option>
+                        <option value="已发货">已发货</option>
+                        <option value="部分发货">部分发货</option>
+                        <option value="未发货">未发货</option>
+                    </select>
+                </div>
+                <div class="item">
+                    <span class="txt">发票类型</span>
+                    <select v-model="form.fplx">
+                        <option value="">请选择</option>
+                        <option value="增值税专用发票">增值税专用发票</option>
+                        <option value="商品17%">商品17%</option>
+                        <option value="可以开软件产品">可以开软件产品</option>
+                        <option value="增值税普通发票">增值税普通发票</option>
+                        <option value="技术服务6%">技术服务6%</option>
+                        <option value="不可以开软件产品">不可以开软件产品</option>
+                    </select>
+                </div>
+                <div class="item">
+                    <span class="txt">其他要求</span>
+                    <input type="text" v-model="form.qtyq">
+                </div>
+            </div>
+        </div>
+
+        <div class="baseinfo">
+            <div class="title">开票信息</div>
+            <div class="list">
+                <div class="item">
+                    <span class="txt">名称</span>
+                    <input type="text" v-model="form.mc">
+                </div>
+                <div class="item">
+                    <span class="txt">纳税人识别号</span>
+                    <input type="text" v-model="form.nsrsbh">
+                </div>
+                <div class="item">
+                    <span class="txt">地址</span>
+                    <input type="text" v-model="form.dz">
+                </div>
+                <div class="item">
+                    <span class="txt">电话</span>
+                    <input type="number" v-model="form.dh">
+                </div>
+                <div class="item">
+                    <span class="txt">开户行</span>
+                    <input type="text" v-model="form.khh">
+                </div>
+                <div class="item">
+                    <span class="txt">账号</span>
+                    <input type="number" v-model="form.zh">
+                </div>
+                <div class="item">
+                    <span class="txt">快递地址</span>
+                    <input type="text" v-model="form.kddz">
+                </div>
+            </div>
+        </div>
+
+        <div class="baseinfo">
+            <div class="title">审批信息</div>
+            <div class="list">
+                <div class="item">
+                    <span class="txt">选择部门</span>
+                    <div class="input" @click="chooseDepartments">{{department.name}}</div>
+                </div>
+                <div class="item">
+                    <span class="txt">选择审批人</span>
+                    <div class="input" @click="chooseContact">
+                        <span v-for="item in approvers">{{item.name}}</span>&nbsp;&nbsp;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="btn-save-box">
+            <div class="btn-save" @click="submit">提交</div>
+        </div>
+    </div>
+
+    <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+    <script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+    <script src="/static/js/dingding.js"></script>
+    <script src="/static/js/util.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                userInfo: {},
+                order: {},
+                department: {},
+                approvers: [],
+                form: {
+                    userId: '',
+                    department: '',
+                    approvers: '',
+                    sqr: '',
+                    ddbh: '',
+                    khmc: '',
+                    ybnsr: '',
+                    edlx: '',
+                    ddje: '',
+                    fkqk: '',
+                    cnfh: '',
+                    fhqk: '',
+                    fplx: '',
+                    qtyq: '',
+                    mc: '',
+                    nsrsbh: '',
+                    dz: '',
+                    dh: '',
+                    khh: '',
+                    zh: '',
+                    kddz: ''
+                }
+            },
+            methods: {
+                chooseDepartments: function(){
+                    var self = this;
+                    ding.chooseDepartments(function(resp){
+                        self.department = resp;
+                        self.form.department = resp.id;
+                    });
+                },
+                chooseContact: function(){
+                    var self = this;
+                    ding.chooseContact(function(resp){
+                        self.approvers = resp;
+                        var approvers = [];
+                        resp.forEach(function(item){
+                            approvers.push(item.emplId);
+                        });
+                        self.form.approvers = approvers.join(',');
+                    })
+                },
+                submit: function () {
+                    var self = this;
+                    ajax.post('/api/invoice/operationSubmit', self.form, function (resp) {
+                        ding.toast('添加成功');
+                        setTimeout(function(){
+                            location.href = '/index/index/invoice';
+                        }, 2000)
+                    })
+                },
+                getOrderData: function(){
+                    var self = this;
+                    axios.get('/api/order_info/getInfo', {
+                        params: {
+                            id: util.getParams('id')
+                        }
+                    }).then(function (resp) {
+                        console.log(resp.data.data)
+                        self.order = resp.data.data;
+
+                        self.form.userId = self.userInfo.userid;
+                        self.form.sqr = self.userInfo.name;
+                        self.form.ddbh = self.order.id;
+                        self.form.khmc = self.order.D_khdw;
+                        self.form.ddje = self.order.E_zj;
+                    })
+                }
+            },
+            created: function(){
+                var self = this;
+                ding.ready(function(){
+                    ding.getUserInfo(function(resp){
+                        self.userInfo = resp.data;
+                        self.getOrderData();
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
