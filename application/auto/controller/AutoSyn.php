@@ -225,4 +225,8 @@ class AutoSyn extends Controller
         }
 
     }
+    public function getLog ()
+    {
+
+    }
 }
