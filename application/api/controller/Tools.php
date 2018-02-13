@@ -42,7 +42,9 @@ class Tools extends Base
         $url       = input('url', '');
         $token     = $this->getAccessToken();
         $getUrl    = config('dingding.apiUrl') . '/get_jsapi_ticket?access_token=' . $token;
+        //dump($getUrl);
         $res       = json_decode(getHttpRequest($getUrl), true);
+        //dump($res);
         $ticket    = $res['ticket'];
         $noncestr  = uniqueID();
         $timestamp = time();

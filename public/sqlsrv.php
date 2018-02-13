@@ -4,7 +4,9 @@ include_once('E:\xampp\htdocs\application\dbhelp\OrderInfoDB.php');
 include_once('E:\xampp\htdocs\application\dbhelp\OrderInfoDataDB.php');
 include_once('E:\xampp\htdocs\application\dbhelp\SalespersonStatisticsDB.php');
 include_once('E:\xampp\htdocs\application\dbhelp\CompanyStatisticsDB.php');
+include_once('E:\xampp\htdocs\application\dbhelp\OrderPayDetailDb.php');
 include_once('E:\xampp\htdocs\application\dbhelp\AutosynLogDb.php');
+
 //include_once('../application/common.php');
 //include_once('../application/config.php');
 //use \OrderInfoDataDB;
@@ -13,13 +15,14 @@ include_once('E:\xampp\htdocs\application\dbhelp\AutosynLogDb.php');
 //header("Content-Type:text/html;charset=utf-8");
 date_default_timezone_set("PRC");
 
-$servern="localhost";
-$coninfo=array("Database"=>"DB_TK","UID"=>"sa","PWD"=>"123qwe123","CharacterSet"=>"utf-8");
-$conn=sqlsrv_connect($servern,$coninfo) or die ("连接失败!");
+//$servern="localhost";
+$servern="47.104.133.136";
+$coninfo=array("Database"=>"DB_TLU","UID"=>"sa","PWD"=>"SAsa123 ","CharacterSet"=>"utf-8");
+$conn=sqlsrv_connect($servern,$coninfo) or die ("connect deny!");
 if($conn){
-	echo "OK ! HELLO SQL SERVER<br />";
-}else{ 
-	echo "Connection could not be established.<br />"; 
+	echo "OK ! HELLO SQL SERVER";
+} else {
+	echo "Connection could not be established.";
 	die( print_r(sqlsrv_errors(), true)); 
 }
 //$mod                       = new OrderInfoDB();
@@ -28,6 +31,7 @@ $mod_data                  = new OrderInfoDataDB();
 $mod_autoSynLog            = new AutosynLogDb();
 $mod_salespersonStatistics = new SalespersonStatisticsDB();
 $mod_companyStatistics     = new CompanyStatisticsDB();
+$mod_payDetail             = new OrderPayDetailDb();
 //$mod_correctError          = new CorrectErrorDB();
 
 $time_current = time();
@@ -36,14 +40,17 @@ $str_current = date('Y-m-d H:i:s',$time_current);
 $str_pre = date('Y-m-d H:i:s');
 //var_dump($str_current);
 $ret_1 = [];
-//$sql_1 = "select p.cus_os_no as contract,p.OS_DD as contractTime, c.NAME as customer,SUM(tp.AMT) as totalprice, min(s.Name) as salesman   from MF_POS p left join CUST c on p.cus_no =c.cus_no left join TF_POS tp on tp.os_no = p.os_no left join SALM s on s.sal_no = p.sal_no where p.OS_DD >='2017-12-01 00:00:00' AND p.OS_DD<'2018-01-01 00:00:00' and p.cus_os_no is not null GROUP BY p.cus_os_no,c.NAME,p.OS_DD ORDER BY contract ";
+$pay_detail = [];
+
 $sql_1 = "select p.cus_os_no as contract,c.NAME as customer,SUM(tp.AMT) as totalprice, min(s.Name) as salesman, min(p.OS_DD) as orderdate   from MF_POS p left join CUST c on p.cus_no =c.cus_no left join TF_POS tp on tp.os_no = p.os_no left join SALM s on s.sal_no = p.sal_no where ((p.OS_DD >='2017-12-01 00:00:00' AND p.OS_DD<'2018-01-01 00:00:00') or (p.Modify_dd >='2017-12-01 00:00:00' AND p.Modify_dd<'2018-01-01 00:00:00')) and p.cus_os_no is not null GROUP BY p.cus_os_no,c.NAME";
-//$sql_2 = "select p.cus_os_no as contract, count(ts.ps_no)*100/count(tp.os_no) as delivery from MF_POS p left join TF_PSS ts on ts.cus_os_no = p.cus_os_no left join TF_POS tp on tp.cus_os_no = p.cus_os_no where p.OS_DD >='2017-12-01 00:00:00' AND p.OS_DD<'2018-01-01 00:00:00' and p.cus_os_no is not null GROUP BY p.cus_os_no ORDER BY contract  ";
+
 $sql_2 = "select p.cus_os_no as contract, ((select SUM(ts.AMT) from TF_PSS ts where ts.cus_os_no = p.cus_os_no)/(select SUM(tp.AMT) from TF_POS tp where tp.cus_os_no = p.cus_os_no)) as delivery,  p.ps_dd as deliverydate from MF_PSS p where  ((p.ps_dd >='2017-12-01 00:00:00' AND p.ps_dd<'2018-01-01 00:00:00') or (p.Modify_dd >='2017-12-01 00:00:00' AND p.Modify_dd<'2018-01-01 00:00:00')) and p.cus_os_no is not null and p.cus_os_no <>''";
-//$sql_3 = "select p.cus_os_no as contract, tm.amtn_bb as paid, cm.amtn_cls as payment  from MF_POS p left join TF_MON tm on tm.CAS_NO = p.cus_os_no left join TC_MON cm on cm.RP_NO = tm.RP_NO where p.OS_DD >='2017-12-01 00:00:00' AND p.OS_DD<'2018-01-01 00:00:00' and p.cus_os_no is not null order by p.cus_os_no, tm.amtn_bb desc";
+
 $sql_3 = "select tm.CAS_NO  as contract, tm.amtn_bb as paid  from  TF_MON tm  where (tm.rp_DD >='2017-12-01 00:00:00' AND tm.rp_DD<'2018-01-01 00:00:00') or (tm.Modify_dd >='2017-12-01 00:00:00' AND tm.Modify_dd<'2018-01-01 00:00:00')";
 
-$sql_4 = "select p.cus_os_no as contract, ml.AMT as paid, tl.AMT as payment  from MF_POS p left join MF_LZ ml on ml.CAS_NO = p.cus_os_no left join TF_LZ tl on tl.cus_os_no = p.cus_os_no where p.OS_DD >='2017-12-01 00:00:00' AND p.OS_DD<'2018-01-01 00:00:00' and p.cus_os_no is not null order by p.cus_os_no, ml.AMT desc";
+//$sql_4 = "select p.cus_os_no as contract, ml.AMT as paid, tl.AMT as payment  from MF_POS p left join MF_LZ ml on ml.CAS_NO = p.cus_os_no left join TF_LZ tl on tl.cus_os_no = p.cus_os_no where p.OS_DD >='2017-12-01 00:00:00' AND p.OS_DD<'2018-01-01 00:00:00' and p.cus_os_no is not null order by p.cus_os_no, ml.AMT desc";
+$sql_pay_detail = "select tm.CAS_NO  as contract,  tc.amtn_cls as payment, tc.RP_DD as paydate  from  TF_MON tm  ,TC_MON tc  where tc.RP_NO = tm.RP_NO and tc.rp_dd >='2017-12-01 00:00:00' AND tc.rp_dd<'2018-01-01 00:00:00'";
+
 $stmt = sqlsrv_query($conn,$sql_1);
 while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
     $ret_1[$row['contract']]['contract'] = $row['contract'];
@@ -65,12 +72,39 @@ while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
     $ret_1[$row['contract']]['paid1'] = number_format($row['paid'],2);
     unset($row);
 }
-$stmt = sqlsrv_query($conn,$sql_4);
-while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
-    $ret_1[$row['contract']]['paid2'] = $row['paid'];
-    $ret_1[$row['contract']]['pavement2'] = $row['payment'];
+$stmt = sqlsrv_query($conn,$sql_pay_detail);
+while ($row = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)) {
+    $pay_detail[]['id'] = getUuid();
+    $pay_detail[]['contract'] = $row['contract'];
+    $pay_detail[]['payment'] = $row['payment'];
+
+
+    //更新日志数据-----------订单付款明细的同步信息
+    $id = getUuid();
+    $data_log[$id]['id'] = $id;
+    $data_log[$id_unique]['syn_timestamp'] = $time_current;
+    //$data_log[$id_unique]['db_name'] = 'orderinfo_data';
+    $data_log[$id_unique]['syn_field'] = (string)json_encode(['contract'=>$row['contract'],'payment'=>$row['payment']],JSON_UNESCAPED_UNICODE);
+    $data_log[$id_unique]['syn_cont'] = '付款明细';
+    $data_log[$id_unique]['flag'] = $row['contract'];
+    $data_log[$id_unique]['type'] = '1';
+
     unset($row);
 }
+
+/*if (!empty($pay_detail)) {
+    foreach ($pay_detail as $key_detail => $value_detail) {
+        //更新日志数据-----------订单付款明细的同步信息
+        $id = getUuid();
+        $data_log[$id]['id'] = $id;
+        $data_log[$id_unique]['syn_timestamp'] = $time_current;
+        //$data_log[$id_unique]['db_name'] = 'orderinfo_data';
+        $data_log[$id_unique]['syn_field'] = (string)json_encode(['contract'=>$value_detail['contract'],'payment'=>$value_detail['payment']],JSON_UNESCAPED_UNICODE);
+        $data_log[$id_unique]['syn_cont'] = '付款明细';
+        $data_log[$id_unique]['flag'] = $value_detail['contract'];
+        $data_log[$id_unique]['type'] = '1';
+    }
+}*/
 
 foreach ($ret_1 as $k => $v) {
     $item         = [
@@ -107,7 +141,6 @@ $data_salespersonStatistics = [];
 $data_companyStatistics     = [];
 $data_log = [];
 $id_unique = '';
-
 
 foreach ($excel_list as $item) {
     //订单数据组合
@@ -147,133 +180,55 @@ foreach ($excel_list as $item) {
         $data_log[$id_unique]['type'] = '2';
     }
 
-/*
-    //统计数据组合
-    $time   = date('Y-m', $item['B_htqyrq']);
-    $time_y = date('Y', $item['B_htqyrq']);
-
-    //销售个人统计有误
-
-    if (!isset($data_salespersonStatistics[$item['F_xsry']][$time])) {
-        $data_salespersonStatistics[$item['F_xsry']][$time] = [
-            'name'             => $item['F_xsry'],
-            'time'             => $time,
-            'time_y'           => $time_y,
-            'myContractVolume' => $item['E_zj'],        //本人签约额
-            'myReturnAmount'   => 0,                    //本人回款额
-            'myReceivables'    => $item['E_zj'],        //本人应收款
-        ];
-    } else {
-        $data_salespersonStatistics[$item['F_xsry']][$time] = [
-            'name'             => $item['F_xsry'],
-            'time'             => $time,
-            'time_y'           => $time_y,
-            'myContractVolume' => $data_salespersonStatistics[$item['F_xsry']][$time]['myContractVolume'] + $item['E_zj'],
-            'myReceivables'    => $data_salespersonStatistics[$item['F_xsry']][$time]['myReceivables'] + $item['E_zj'],
-        ];
-    }
-
-
-    //公司统计数据有误
-    if (isset($data_companyStatistics[$time])) {
-        $data_companyStatistics[$time] = $data_companyStatistics[$time] + $item['E_zj'];
-    }
-    else {
-        $data_companyStatistics[$time] = $item['E_zj'];
-    }*/
-
 }
 
 //写入订单信息
 if (!empty($insert_orderData)) {
     $mod_data->batchInsert($insert_orderData);
 }
-/*
-//写入销售统计信息
-$list_salespersonStatistics = [];
-foreach ($data_salespersonStatistics as $k => $v) {
-    foreach ($v as $key => $value) {
-        $info = $mod_salespersonStatistics->getInfo(['name' => $value['name'], 'time' => $value['time']]);
-        if (empty($info)) {
-            $list_salespersonStatistics[] = $value;
-        }
-        else {
-            //$myContractVolume = $value['myContractVolume'] + $info['myContractVolume'];
-            //$myReceivables    = $value['myReceivables'] + $info['myReceivables'];
-            $myContractVolume = $value['myContractVolume'];
-            $myReceivables    = $value['myReceivables'];
-            $mod_salespersonStatistics->update([
-                'myContractVolume' => $myContractVolume,
-                'myReceivables'    => $myReceivables
-            ], [
-                'name' => $value['name'],
-                'time' => $value['time']
-            ]);
-            //var_dump('saleStaticsUpdate');
-        }
-    }
+
+//写入付款明细
+if (!empty($pay_detail)) {
+    $mod_payDetail->batchInsert($pay_detail);
 }
-//var_dump($list_salespersonStatistics);
-if (!empty($list_salespersonStatistics)) {
-    $mod_salespersonStatistics->batchInsert($list_salespersonStatistics);
-    //var_dump('saleStaticsInsert');
-}
-//写入公司总统计
-$list_companyStatistics = [];
-foreach ($data_companyStatistics as $k => $v) {
-    $info = $mod_companyStatistics->getInfo(['time' => $k]);
-    if (empty($info)) {
-        $list_companyStatistics[] = [
-            'time'                  => $k,
-            'companyContractVolume' => $v,
-        ];
-    } else {
-        $companyContractVolume = $info['companyContractVolume'] + $v;
-        $mod_companyStatistics->update(['companyContractVolume' => $companyContractVolume], ['time' => $k]);
-        //var_dump('companyStaticsUpdate');
-    }
-}
-if (!empty($list_companyStatistics)) {
-    //$mod_companyStatistics->batchInsert($list_companyStatistics);
-    echo "companyStasticsInsert <br >";
-}*/
 
 //写入自动更新日志
 if (!empty($data_log)) {
     $mod_autoSynLog->batchInsert($data_log);
-    echo "autoSynLog <br >";
+    echo "autoSynLog";
 }
+
+//
+
+$salesman_statistics = [];
+$company_statistics = [];
 
 foreach ($excel_list as $key =>  $item) {
     //销售信息数据重新写入
     $salesman = $item['F_xsry'];
+    $date_time = date('Y-m-d H:i:s',$item['B_htqyrq']);
     $date_month = date('Y-m',$item['B_htqyrq']);
     $date_year = date('Y',$item['B_htqyrq']);
+    $timestamp_s = strtotime($date_month . '-01 00:00:00');
+    $date_start = date('Y-m-d',$timestamp_s);
+    $timestamp_e = strtotime(" $date_start +1 month -1 second");
 
-    //下面逻辑需要修改，取出来的是订单的数据，个人的统计信息需要删掉重新添加
-    $info_salespersonStatistics = $mod_salespersonStatistics->getInfo(['name'=>$salesman,'time'=>$date_month]);
+    //下面逻辑需要修改，取出来的是月份的订单的数据，个人的统计信息需要删掉重新添加
+    $info_order_statistics = $mod_data->get(['F_xsry'=>$salesman,'B_htqyrq'=>['$gte'=>$timestamp_s,'$lte'=>$timestamp_e]]);
+    //var_dump($info_order_statistics);
 
-    //
+    foreach ($info_order_statistics as $key_order => $order) {
+        if (empty($salesman_statistics[$key][$salesman])) {
 
+        } else {
 
-    if (empty($info_salespersonStatistics)) {
-
-    } else {
-        foreach ($info_salespersonStatistics as $sale_key => $sale_data) {
-            if (empty($data_salespersonStatistics[$salesman][''])) {
-                $data_salespersonStatistics = $sale_date[''];
-            }
         }
     }
-
-
-
-
-
     //公司总统计信息数据重新写入
 
-
 }
+
+
 
 
 
@@ -321,7 +276,8 @@ function strEmptyFloat($str)
     return floatval($str);
 }
 
-//释放资源、数组。测试脚本是否执行
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!释放资源,  销毁数组， 清除内存 !!!!!!!!!!!!!!!!!!!!!!!
+//测试脚本是否执行
 $str = file_get_contents("E:\\xampp\\htdocs\\public\\test.txt");
 $str .= "\t" . $str_current  . "\n" ;
 file_put_contents("E:\\xampp\\htdocs\\public\\test.txt",$str);
