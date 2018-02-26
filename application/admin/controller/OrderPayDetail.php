@@ -20,9 +20,11 @@ class OrderPayDetail extends Base
         $data = $this->mod_payDetail->get($where);
         $list = [];
         foreach ($data as $item) {
+            $item['paydate'] = date('Y年m月d日 H:i:s',strtotime($item['paydate']['date']));
             $list[] = $item;
         }
+        /*return json(ok($list));*/
         return json(ok($list));
     }
-
 }
+

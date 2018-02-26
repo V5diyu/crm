@@ -105,6 +105,7 @@
                     ding.getUserInfo(function(resp){
                         self.userInfo = resp.data;
                         self.getData();
+                        alert(resp.data.isCharge);
                     });
                 });
 

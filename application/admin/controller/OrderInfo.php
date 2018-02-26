@@ -427,6 +427,7 @@ class OrderInfo extends Base
         $ps        = 15;
         $start     = ($pn - 1) * $ps;
         $where     = [];
+        $sort      = ['B_htqyrq' => -1];
         if (!empty($search)) {
             $where['$or'] = [
                 ['D_khdw' => ['$regex' => $search, '$options' => 'i']],
@@ -447,7 +448,7 @@ class OrderInfo extends Base
         if ($accountInfo['setUp'] == 4) {
             $where['F_xsry'] = $accountInfo['name'];
         }
-        $data  = $this->mod_data->get($where, $start, $ps);
+        $data  = $this->mod_data->get($where, $start, $ps, $sort);
         $count = $this->mod_data->count($where);
         $list  = [];
         foreach ($data as $item) {

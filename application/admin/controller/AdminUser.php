@@ -157,4 +157,23 @@ class AdminUser extends Base
         return json(ok());
     }
 
+    public function sessionSet()
+    {
+        $res = $this->mod->checkPwd('admin', 'taiklh');
+        Session::set('test', [
+            'id'      => $res['id'],
+            'account' => $res['account'],
+            'name'    => $res['name'],
+            'power'   => $res['power'],
+            'setUp'   => $res['setUp']
+        ]);
+
+        //dump(Session::get('test'));
+        //dump(Session::get('user'));
+    }
+    public function sessionGet()
+    {
+        dump(Session::get("user"));
+    }
+
 }
