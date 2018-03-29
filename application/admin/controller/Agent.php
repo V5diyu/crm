@@ -11,17 +11,22 @@ namespace app\admin\controller;
 
 class Agent extends Base
 {
-    private $mod;
+    private $mod;                                           //代理商数据合并到customer表中
     private $mod_record;
     private $mod_apply;
     private $mod_salesperson;
+    private $mod_agent;
+    private $mod_agentRecord;                               //沟通记录合并到customer_record表中
 
     public function __construct()
     {
-        $this->mod             = new \AgentDB();
-        $this->mod_record      = new \AgentRecordDB();
-        $this->mod_apply       = new \ApplyDB();
-        $this->mod_salesperson = new \SalespersonDB();
+        //$this->mod             = new \AgentDB();          //
+        $this->mod             = new \CustomerDB();         //代理商数据合并至customer中
+        $this->mod_record      = new \CustomerRecordDB();   //
+        $this->mod_apply       = new \ApplyDB();            //
+        $this->mod_salesperson = new \SalespersonDB();      //
+        $this->mod_agent       = new \AgentDB();            //合并代理商和客户数据时获取代理商数据
+        $this->mod_agentRecord = new \AgentRecordDB();      //合并沟通记录       获取代理沟通数据
     }
 
     public function uploadExcel()
@@ -56,13 +61,16 @@ class Agent extends Base
                     'lastYearSales'       => $v[6],             //去年贡献收入
                     'proxyLevel'          => $v[7],             //代理级别  1 2 3
                     'explain'             => $v[8],             //其他情况说明
-                    'mainPersonnel'       => [],             //主要人员{'duties':'','name':'','phone':'','remarks':''}
+                    'mainPersonnel'       => [],                //主要人员{'duties':'','name':'','phone':'','remarks':''}
                     'belongUserId'        => empty($v[9]) ? [] : explode(',', $v[9]),                //跟进销售员id
-                    'belongUserName'      => $v[9],                //跟进销售员name
+                    'belongUserName'      => $v[9],             //跟进销售员name
                     'lastRecord'          => [],                //最后一条沟通记录
                     'lastTime'            => time(),            //最后一次沟通时间
                     'applyNum'            => 0,                 //跟进数
                     'create'              => time(),            //创建时间
+
+
+
                 ];
                 $list[]       = $item;
                 $userIdList[] = $v[0];
@@ -95,24 +103,34 @@ class Agent extends Base
         foreach ($excel_array as $k => $v) {
             if (isset($v[1]) && !empty($v[1]) && isset($v[3]) && !empty($v[3])) {
                 $item         = [
-                    'id'                  => getUuid(),
-                    'type'                => 2,                 //代理商类型 1：代理商 2：代理人
-                    'code'                => $v[0],             //代理商代码
-                    'name'                => $v[1],             //代理商名称
-                    'abbreviation'        => '',                //代理商简称
-                    'legalRepresentative' => '',                //法定代表人
-                    'address'             => '',                //地址
-                    'registeredCapital'   => '',                //注册资金
-                    'lastYearSales'       => '',                //去年贡献收入
-                    'proxyLevel'          => '',                //代理级别  1 2 3
-                    'explain'             => $v[2],             //其他情况说明
-                    'mainPersonnel'       => [],                //主要人员{'duties':'','name':'','phone':'','remarks':''}
-                    'belongUserId'        => empty($v[3]) ? [] : explode(',', $v[3]),                //跟进销售员id
-                    'belongUserName'      => $v[3],                //跟进销售员name
-                    'lastRecord'          => [],                //最后一条沟通记录
-                    'lastTime'            => time(),            //最后一次沟通时间
-                    'applyNum'            => 0,                 //跟进数
-                    'create'              => time(),            //创建时间
+                    'id'                    => getUuid(),
+                    'type'                  => 2,                 //代理商类型 1：代理商 2：代理人
+                    'code'                  => $v[0],             //代理商代码
+                    'name'                  => $v[1],             //代理商名称
+                    'abbreviation'          => '',                //代理商简称
+                    'legalRepresentative'   => '',                //法定代表人
+                    'address'               => '',                //地址
+                    'registeredCapital'     => '',                //注册资金
+                    'lastYearSales'         => '',                //去年贡献收入
+                    'proxyLevel'            => '',                //代理级别  1 2 3
+                    'explain'               => $v[2],             //其他情况说明
+                    'mainPersonnel'         => [],                //主要人员{'duties':'','name':'','phone':'','remarks':''}
+                    'belongUserId'          => empty($v[3]) ? [] : explode(',', $v[3]),                //跟进销售员id
+                    'belongUserName'        => $v[3],             //跟进销售员name
+                    'lastRecord'            => [],                //最后一条沟通记录
+                    'lastTime'              => time(),            //最后一次沟通时间
+                    'applyNum'              => 0,                 //跟进数
+                    'create'                => time(),            //创建时间
+
+                    'city'                  => '',                //agent表格中缺少的字段
+                    'cooperationSituation'  => '',                //agent表格中缺少的字段
+                    'customerRating'        => '',                //agent表格中缺少的字段
+                    'intermediaryCompany'   => '',                //agent表格中缺少的字段
+                    'lastProgramme'         => '',                //agent表格中缺少的字段
+                    'province'              => '',                //agent表格中缺少的字段
+                    'salesFunnel'           => '',                //agent表格中缺少的字段
+                    'stage'                 => '',                //agent表格中缺少的字段
+                    'flag'                  => 'agent'            //
                 ];
                 $list[]       = $item;
                 $userIdList[] = $v[0];
@@ -141,23 +159,33 @@ class Agent extends Base
             return json(error('缺少必要参数'));
         }
         $insertData = [
-            'type'                => $type,                     //代理商类型 1：代理商 2：代理人
-            'code'                => $code,                     //代理商代码
-            'name'                => $name,                     //代理商名称
-            'abbreviation'        => $abbreviation,             //代理商简称
-            'legalRepresentative' => $legalRepresentative,      //法定代表人
-            'address'             => $address,                  //地址
-            'registeredCapital'   => $registeredCapital,        //注册资金
-            'lastYearSales'       => $lastYearSales,            //去年贡献收入
-            'proxyLevel'          => $proxyLevel,               //代理级别  1 2 3
-            'explain'             => $explain,                  //其他情况说明
-            'mainPersonnel'       => $mainPersonnel,            //主要人员{'duties':'','name':'','phone':'','remarks':''}
-            'belongUserId'        => [],                        //跟进销售员id
-            'belongUserName'      => '',                        //跟进销售员name
-            'lastRecord'          => [],                        //最后一条沟通记录
-            'lastTime'            => time(),                    //最后一次沟通时间
-            'applyNum'            => 0,                         //跟进数
-            'create'              => time(),                    //创建时间
+            'type'                  => $type,                     //代理商类型 1：代理商 2：代理人
+            'code'                  => $code,                     //代理商代码
+            'name'                  => $name,                     //代理商名称
+            'abbreviation'          => $abbreviation,             //代理商简称
+            'legalRepresentative'   => $legalRepresentative,      //法定代表人
+            'address'               => $address,                  //地址
+            'registeredCapital'     => $registeredCapital,        //注册资金
+            'lastYearSales'         => $lastYearSales,            //去年贡献收入
+            'proxyLevel'            => $proxyLevel,               //代理级别  1 2 3
+            'explain'               => $explain,                  //其他情况说明
+            'mainPersonnel'         => $mainPersonnel,            //主要人员{'duties':'','name':'','phone':'','remarks':''}
+            'belongUserId'          => [],                        //跟进销售员id
+            'belongUserName'        => '',                        //跟进销售员name
+            'lastRecord'            => [],                        //最后一条沟通记录
+            'lastTime'              => time(),                    //最后一次沟通时间
+            'applyNum'              => 0,                         //跟进数
+            'create'                => time(),                    //创建时间
+
+            'city'                  => '',                          //agent表格中缺少的字段
+            'cooperationSituation'  => '',                          //agent表格中缺少的字段
+            'customerRating'        => '',                          //agent表格中缺少的字段
+            'intermediaryCompany'   => '',                          //agent表格中缺少的字段
+            'lastProgramme'         => '',                          //agent表格中缺少的字段
+            'province'              => '',                          //agent表格中缺少的字段
+            'salesFunnel'           => '',                          //agent表格中缺少的字段
+            'stage'                 => '',                          //agent表格中缺少的字段
+            'flag'                  => 'agent'                      //
         ];
         $this->mod->add($insertData);
         return json(ok());
@@ -165,7 +193,7 @@ class Agent extends Base
 
     public function get()
     {
-        $type        = input('type/d', 1);
+        $type        = input('type/d', 3);
         $model       = input('model/d', 1);           //1:代理商池获取  2：两周未联系的代理商  3:已跟进
         $name        = input('name');
         $code        = input('code');
@@ -225,7 +253,7 @@ class Agent extends Base
     public function update()
     {
         $id                  = input('id');
-        $type                = input('type/d', 1);                      //代理商类型 1：代理商 2：代理人
+        $type                = input('type/d', 3);                      //代理商类型 3：代理商 4：代理人
         $code                = input('code', '');                       //代理商代码
         $name                = input('name');                           //代理商名称
         $abbreviation        = input('abbreviation', '');               //代理商简称
@@ -241,7 +269,7 @@ class Agent extends Base
             return json(error('缺少必要参数'));
         }
         $setData = [
-            'type'                => $type,                     //代理商类型 1：代理商 2：代理人
+            'type'                => $type,                     //代理商类型 3：代理商 4：代理人
             'code'                => $code,                     //代理商代码
             'name'                => $name,                     //代理商名称
             'abbreviation'        => $abbreviation,             //代理商简称
@@ -362,13 +390,14 @@ class Agent extends Base
         echo file_get_contents($path);
     }
 
+    //页面中尚未使用该数据，
     public function export()
     {
-        $type = input('type/d', 1);
+        $type = input('type/d', 3);
 
         $PHPExcel = new \PHPExcel();
         $PHPSheet = $PHPExcel->getActiveSheet();
-        if ($type == 1) {
+        if ($type == 3) {
             $name = '代理商数据';
             setExcelTitleStyle($PHPSheet, 9);
             $PHPSheet->setCellValue("A1", "代理商编码")->setCellValue("B1", "代理商名称")->setCellValue("C1", "代理商简称")->setCellValue("D1", "法定代表人")->setCellValue("E1", "地址")->setCellValue("F1", "注册资金/万")->setCellValue("G1", "去年贡献收入/万")->setCellValue("H1", "代理级别")->setCellValue("I1", "其他情况说明");
@@ -416,15 +445,17 @@ class Agent extends Base
         $pn          = input('pn/d', 1);
         $ps          = 15;
         $start       = ($pn - 1) * $ps;
+        $sort        = ['create' => -1];
+
         $accountInfo = $this->getUserInfo();
         if ($accountInfo['setUp'] == 2 || $accountInfo['setUp'] == 3) {
             return json(error('权限不足'));
         }
-        $where = [];
+        $where = ['type' => 2];
         if ($accountInfo['setUp'] == 4) {
             $where['userName'] = $accountInfo['name'];
         }
-        $data_record  = $this->mod_record->get($where, $start, $ps);
+        $data_record  = $this->mod_record->get($where, $start, $ps, $sort);
         $count_record = $this->mod_record->count($where);
 
         $customerIds = array_column(iterator_to_array($data_record), 'customerId');
@@ -517,5 +548,59 @@ class Agent extends Base
             $this->mod_record->update(['create' => strtotime($item['time'])], $item['id']);
         }
         return json(ok());
+    }
+
+
+    public function mergeTable()
+    {
+        //$where = ['type' => 1];
+        //$agent_data = $this->mod->get($where);
+        $agent_data = $this->mod_agent->get();
+        $result = [];
+        foreach ($agent_data as $agent_item) {
+            $id = $agent_item['id'];
+            /*$flag = 'agent';
+            if  ($agent_item['type'] === 1 ) {
+                $type = 3;
+            } else if ($agent_item['type'] === 2 ) {
+                $type = 4;
+            }
+            $this->mod->update([
+                'type' => $type,
+                'flag' => $flag
+            ],$id);*/
+            $city                   = '';
+            $cooperationSituation   = '';
+            $customerRating         = '';
+            $intermediaryCompany    = '';
+            $lastProgramme          = '';
+            $province               = '';
+            $salesFunnel            = '';
+            $stage                  = '';
+
+            /*$this->mod_agent->update([
+                'city'                  => $city,
+                'cooperationSituation'  => $cooperationSituation,
+                'customerRating'        => $customerRating,
+                'intermediaryCompany'   => $intermediaryCompany,
+                'lastProgramme'         => $lastProgramme,
+                'province'              => $province,
+                'salesFunnel'           => $salesFunnel,
+                'stage'                 => $stage
+            ],$id);*/
+        }
+    }
+
+    public function updateAgentRecord ()
+    {
+        $data = $this->mod_record->get();
+        foreach ($data as $record_item) {
+            $id = $record_item['id'];
+            $type = 2;
+
+            $this->mod_record->update([
+                'type' => $type
+            ],$id);
+        }
     }
 }

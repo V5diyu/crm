@@ -20,6 +20,58 @@
             <div class="customerType-box">
                 <span class="type" :class="{'type-active': form.type == 1}" @click="switchType(1)">终端</span>
                 <span class="type" :class="{'type-active': form.type == 2}" @click="switchType(2)">厂家</span>
+                <span class="type" :class="{'type-active': form.type == 3}" @click="switchType(3)">代理商</span>
+                <span class="type" :class="{'type-active': form.type == 4}" @click="switchType(4)">代理人</span>
+            </div>
+        </div>
+
+        <!--代理人-客户信息-->
+        <div class="baseinfo" v-show="form.type == 4">
+            <div class="title">客户信息</div>
+            <div class="list">
+                <div class="item">
+                    <span class="txt">名称</span>
+                    <input type="text" v-model="form.name">
+                </div>
+                <div class="item">
+                    <span class="txt">编号</span>
+                    <input type="text" v-model="form.code">
+                </div>
+                <div class="item">
+                    <span class="txt">其他情况说明</span>
+                    <input type="text" v-model="form.explain">
+                </div>
+                <div class="item">
+                    <span class="txt">跟进销售人员</span>
+                    <input type="text" v-model="form.belongUserName">
+                </div>
+            </div>
+        </div>
+
+        <!--代理商-客户信息-->
+        <div class="baseinfo" v-show="form.type == 3">
+            <div class="title">客户信息</div>
+            <div class="list">
+                <div class="item">
+                    <span class="txt">名称</span>
+                    <input type="text" v-model="form.name">
+                </div>
+                <div class="item">
+                    <span class="txt">编号</span>
+                    <input type="text" v-model="form.code">
+                </div>
+                <div class="item">
+                    <span class="txt">简称</span>
+                    <input type="text" v-model="form.abbreviation">
+                </div>
+                <div class="item">
+                    <span class="txt">其他情况说明</span>
+                    <input type="text" v-model="form.explain">
+                </div>
+                <div class="item">
+                    <span class="txt">跟进销售人员</span>
+                    <input type="text" v-model="form.belongUserName">
+                </div>
             </div>
         </div>
 
@@ -187,25 +239,25 @@
             data: {
                 userInfo: null,
                 form: {
-                    code: '',           // 客户编号
+                    code: '',                       // 客户编号
                     userId: '',
-                    belongUserName: '',                 // 跟进销售人员
-                    type: 1,                      //1:终端  2:厂家
-                    name: '',                     //客户名称
-                    province: '',                 //省
-                    city: '',                     //市
-                    address: '',                  //地址
-                    stage: '',                    //客户阶段
-                    explain: '',                  //其他情况说明
-                    intermediaryCompany: '',      //中间公司
+                    belongUserName: '',             // 跟进销售人员
+                    type: 1,                        //1:终端  2:厂家  3:代理商  4:代理人
+                    name: '',                       //客户名称
+                    province: '',                   //省
+                    city: '',                       //市
+                    address: '',                    //地址
+                    stage: '',                      //客户阶段
+                    explain: '',                    //其他情况说明
+                    intermediaryCompany: '',        //中间公司
                     mainPersonnel: [{}],            //主要人员{'duties':'','name':'','phone':'','remarks':''}
-                    cooperationSituation: '',     //合作情况{'historical':'','income'：''}
-                    abbreviation: '',             //简称
-                    legalRepresentative: '',      //法定代表人
-                    registeredCapital: '',        //注册资金
-                    lastYearSales: '',            //去年年销售额
-                    customerRating: '',           //客户评级
-                    programme: [{}]               // 跟踪方案
+                    cooperationSituation: '',       //合作情况{'historical':'','income'：''}
+                    abbreviation: '',               //简称
+                    legalRepresentative: '',        //法定代表人
+                    registeredCapital: '',          //注册资金
+                    lastYearSales: '',              //去年年销售额
+                    customerRating: '',             //客户评级
+                    programme: [{}]                 //跟踪方案
                 }
             },
             methods: {
@@ -213,8 +265,8 @@
                     this.form = {
                         code: '',           // 客户编号
                         userId: '',
-                        belongUserName: '',                 // 跟进销售人员
-                        type: type,                      //1:终端  2:厂家
+                        belongUserName: '',           // 跟进销售人员
+                        type: type,                   //1:终端  2:厂家  3:代理商  4:代理人
                         name: '',                     //客户名称
                         province: '',                 //省
                         city: '',                     //市
@@ -222,14 +274,14 @@
                         stage: '',                    //客户阶段
                         explain: '',                  //其他情况说明
                         intermediaryCompany: '',      //中间公司
-                        mainPersonnel: [{}],            //主要人员{'duties':'','name':'','phone':'','remarks':''}
+                        mainPersonnel: [{}],          //主要人员{'duties':'','name':'','phone':'','remarks':''}
                         cooperationSituation: '',     //合作情况{'historical':'','income'：''}
                         abbreviation: '',             //简称
                         legalRepresentative: '',      //法定代表人
                         registeredCapital: '',        //注册资金
                         lastYearSales: '',            //去年年销售额
                         customerRating: '',           //客户评级
-                        programme: [{}]               // 跟踪方案
+                        programme: [{}]               //跟踪方案
                     }
                 },
                 datepicker: function (index) {

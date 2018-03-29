@@ -28,21 +28,33 @@
                     <span class="right">{{item.A_hth}}</span>
                 </div>
                 <div class="content">
-                    <div class="row">
+                    <!--<div class="row">
                         <span class="row-left">所属项目</span>
                         <span class="row-right">{{item.C_ssxm}}</span>
+                    </div>-->
+                    <div class="row">
+                        <span class="row-left">总价</span>
+                        <span class="row-right">{{item.E_zj}}</span>
                     </div>
                     <div class="row">
                         <span class="row-left">付款金额</span>
                         <span class="row-right">{{item.J_fkje}}</span>
                     </div>
-                    <div class="row">
+                    <!--<div class="row">
                         <span class="row-left">付款比例</span>
                         <span class="row-right">{{item.K_fkbl}}</span>
+                    </div>-->
+                    <div class="row">
+                        <span class="row-left">发货比例</span>
+                        <span class="row-right">{{item.H_fhbl}}</span>
                     </div>
+                    <div class="row">
+                        <span class="row-left">尾款到期日</span>
+                        <span class="row-right">{{item.N_wkdqr}}</span>
+                    </div>
+
                 </div>
             </a>
-
         </div>
         <div class="no-data" v-show="isNoData">暂无数据</div>
     </div>
@@ -51,8 +63,12 @@
     <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
     <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
     <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+
     <script src="/static/js/dingding.js"></script>
     <script src="/static/js/util.js"></script>
+    <!--<script src="/mobile/lib/ydui/ydui.js"></script>  -->              <!--组件类库-->
+    <!--<script src="/mobile/lib/ydui/ydui.flexible.js"></script> -->      <!--自适应类库-->
+
     <script>
 
         var app = new Vue({
@@ -105,7 +121,7 @@
                     ding.getUserInfo(function(resp){
                         self.userInfo = resp.data;
                         self.getData();
-                        alert(resp.data.isCharge);
+                        //alert(resp.data.isCharge);
                     });
                 });
 

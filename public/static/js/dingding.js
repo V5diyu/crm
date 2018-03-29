@@ -22,7 +22,7 @@ var ding = {
                     'device.notification.prompt', 'biz.ding.post',
                     'biz.util.openLink', 'runtime.permission.requestOperateAuthCode',
                     'biz.chat.chooseConversationByCorpId', 'biz.contact.departmentsPicker',
-                    'dd.biz.user'] // 必填，需要使用的jsapi列表，注意：不要带dd。
+                    'dd.biz.user','get_jsapi_ticket'] // 必填，需要使用的jsapi列表，注意：不要带dd。
             });
             dd.ready(function(){
                 cb && cb();

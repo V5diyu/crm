@@ -15,6 +15,7 @@ class Salesperson extends Base
     private $mod_salespersonStatistics;
     private $mod_companyStatistics;
     private $mod_orderInfoData;
+    private $mod_salepersonReceive;
 
     public function __construct()
     {
@@ -22,6 +23,7 @@ class Salesperson extends Base
         $this->mod_salespersonStatistics = new \SalespersonStatisticsDB();
         $this->mod_companyStatistics     = new \CompanyStatisticsDB();
         $this->mod_orderInfoData         = new \OrderInfoDataDB();
+        $this->mod_salepersonReceive     = new \SalespersonReceiveDB();
     }
 
 
@@ -82,6 +84,8 @@ class Salesperson extends Base
         $type  = input('type/d', 1);
         $ps    = 15;
         $start = ($pn - 1) * $ps;
+
+
         if ($type == 1) {
             $time = date('Y-m');
         }
@@ -89,26 +93,53 @@ class Salesperson extends Base
             $timestamp = strtotime(date('Y') . '-' . (date('m') - 1));
             $time      = date('Y-m', $timestamp);
         }
+        //接口修改时间
         $time_y                       = date('Y');
         $where                        = ['time' => $time];
+        /*$time_y  =  '2017';
+        $where   =  ['time' => '2017-12'];
+        $time    =  '2017-12';*/
         $rankingList                  = [];
+        //销售当月的排名，按照签约额排名
         $data_ranking_userStatistics  = $this->mod_salespersonStatistics->get($where, $start, $ps, ['myContractVolume' => -1]);
+        //销售总数
         $count_ranking_userStatistics = $this->mod_salespersonStatistics->count($where);
+        //公司订单月数据
         $companyStatistics            = $this->mod_companyStatistics->getInfo(['time' => $time]);
         $i                            = $start;
+
+
+        //此处为调试
+
         foreach ($data_ranking_userStatistics as $item) {
             $i++;
+
+            //销售个人月回款数据
+            $userReceive_m       = $this->mod_salepersonReceive->get([
+                'name'   => $item['name'],
+                'time'   => $time
+            ]);
+
+            //销售个人当年回款数据
+            $userReceive_y       = $this->mod_salepersonReceive->get([
+                'name'   => $item['name'],
+                'time_y' => $time_y
+            ]);
+
+            //销售个人当年的订单数据
             $userStatistics_y    = $this->mod_salespersonStatistics->get([
                 'name'   => $item['name'],
                 'time_y' => $time_y
             ]);
+            //销售个人全部的订单数据
             $userStatistics_data = $this->mod_salespersonStatistics->get(['name' => $item['name']]);
             $rankingList[]       = [
                 'name'                  => $item['name'],
                 'ranking'               => $i,
                 'myContractVolume'      => $item['myContractVolume'],
                 'companyContractVolume' => isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '',
-                'myReturnAmount'        => array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount')),
+                //'myReturnAmount'        => array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount')),
+                'myReturnAmount'        => array_sum(array_column(iterator_to_array($userReceive_y),'receive')),
                 'myReceivables'         => array_sum(array_column(iterator_to_array($userStatistics_data), 'myReceivables')),
                 'myOverdueLoans'        => $this->mod_orderInfoData->getOverdueLoansByName($item['name']),
             ];

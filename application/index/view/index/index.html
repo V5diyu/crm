@@ -9,12 +9,13 @@
     <meta http-equiv="Pragma" CONTENT="no-cache">
     <title>工作台</title>
     <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/mobile/iconfont/iconfont1.css">
     <link rel="stylesheet" type="text/css" href="/static/css/common.css">
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
 </head>
 <body>
 <div class="container index nav-fixed-bottom" id="app" v-cloak>
-    <div class="header">
+    <!--<div class="header">
         <a class="item" href="/index/index/productTime">
             <img src="/static/img/icon-jiaoqi.png">
             <p>产品交期</p>
@@ -27,7 +28,7 @@
             <img src="/static/img/icon-xiaoxiang.png">
             <p>销项发票</p>
         </a>
-    </div>
+    </div>-->
 
     <div class="own">
         <div class="top">
@@ -56,49 +57,64 @@
                 <p class="p2">本人签约排名</p>
             </div>
             <div class="item">
-                <p class="p1">{{indexData.myContractVolume}}</p>
-                <p class="p2">本人签约额</p>
+                <p class="p1">{{ indexData.myContractVolume }}</p>
+                <p class="p2">本人月签约额</p>
             </div>
             <div class="item">
-                <p class="p1">{{indexData.companyContractVolume}}</p>
-                <p class="p2">公司签约额</p>
+                <p class="p1">{{ indexData.companyContractVolume }}</p>
+                <p class="p2">公司本月签约额</p>
             </div>
             <div class="item">
-                <p class="p1">{{indexData.myReturnAmount}}</p>
-                <p class="p2">本人当年回款额</p>
+                <p class="p1">{{ indexData.myReceiveYear }}</p>
+                <p class="p2">本人本年回款额</p>
             </div>
             <div class="item">
-                <p class="p1">{{indexData.myReceivables}}</p>
+                <p class="p1">{{ indexData.myReceivables }}</p>
                 <p class="p2">本人应收账款总额</p>
             </div>
             <div class="item">
-                <p class="p1">{{indexData.myOverdueLoans}}</p>
+                <p class="p1">{{ indexData.myOverdueLoans }}</p>
                 <p class="p2">本人超期未回款总额</p>
             </div>
         </div>
         <div class="list" v-show="userInfo.isCharge == 2">
-            <!--<div class="item">-->
-                <!--<p class="p1">{{indexData.ranking || '无'}}</p>-->
-                <!--<p class="p2">公司签约排名</p>-->
-            <!--</div>-->
-            <!--<div class="item">-->
-                <!--<p class="p1">{{indexData.myContractVolume}}</p>-->
-                <!--<p class="p2">公司签约额</p>-->
-            <!--</div>-->
+            <!--<div class="item">
+                <p class="p1">{{indexData.myContractVolume}}</p>
+                <p class="p2">公司签约额</p>
+            </div>-->
             <div class="item item-charge">
+                <p class="p1">{{ indexData.companyContractVolume }}</p>             <!--{{indexData.companyContractVolume}}-->
+                <p class="p2">公司月签约额</p>
+            </div>
+
+            <div class="item item-charge">
+                <p class="p1">{{ indexData.myContractYear }}</p>
+                <p class="p2">公司本年签约额</p>
+            </div>
+
+            <div class="item item-charge">
+                <p class="p1">{{ indexData.myReceiveMonth }}</p>
+                <p class="p2">公司月回款额</p>
+            </div>
+
+            <div class="item item-charge">
+                <p class="p1">{{ indexData.myReceiveYear }}</p>             <!--{{indexData.myReturnAmount}}-->
+                <p class="p2">公司本年回款额</p>
+            </div>
+            <!--<div class="item item-charge">
                 <p class="p1">{{indexData.companyContractVolume}}</p>
                 <p class="p2">公司签约额</p>
-            </div>
-            <div class="item item-charge">
+            </div>-->
+            <!--<div class="item item-charge">
                 <p class="p1">{{indexData.myReturnAmount}}</p>
                 <p class="p2">公司当年回款额</p>
-            </div>
+            </div>-->
             <div class="item item-charge">
-                <p class="p1">{{indexData.myReceivables}}</p>
+                <p class="p1">{{ indexData.myReceivables }}</p>
                 <p class="p2">公司应收账款总额</p>
             </div>
             <div class="item item-charge">
-                <p class="p1">{{indexData.myOverdueLoans}}</p>
+                <p class="p1">{{ indexData.myOverdueLoans }}</p>
                 <p class="p2">公司超期未回款总额</p>
             </div>
         </div>
@@ -132,7 +148,7 @@
         </div>
 
         <div class="list">
-            <div class="item" v-for="(item,index) in indexData.rankingList">
+            <div class="item" v-for="(item,index) in indexData.rankingList" style="">
                 <span class="num">{{++index}}</span>
                 <span class="img" v-if="item.avatar" :style="{'background-image': 'url('+item.avatar + ')'}"></span>
                 <span class="img" v-if="!item.avatar">
@@ -155,14 +171,22 @@
             <i class="iconfont icon-gongzuotai1"></i>
             <p>工作台</p>
         </a>
+        <a class="nav-item" href="/index/index/order">
+            <i class="iconfont icon-zichanxinxibuquancelve"></i>
+            <p>订单查询</p>
+        </a>
+        <a class="nav-item" href="/index/index/lend">
+            <i class="iconfont icon-jihua"></i>
+            <p>借用</p>
+        </a>
         <a class="nav-item" href="/index/index/customer">
             <i class="iconfont icon-category"></i>
             <p>客户</p>
         </a>
-        <a class="nav-item" href="/index/index/agent">
+        <!--<a class="nav-item" href="/index/index/agent">
             <i class="iconfont icon-dailishangguanli"></i>
             <p>代理商</p>
-        </a>
+        </a>-->
         <a v-if="userInfo.roleName === '主管'" href="/index/index/managerRecord" class="nav-item">
             <i class="iconfont icon-chanpin"></i>
             <p>沟通记录</p>
@@ -252,6 +276,10 @@
                         self.indexData.myReturnAmount = resp.data.data.myReturnAmount;
                         self.indexData.myReceivables = resp.data.data.myReceivables;
                         self.indexData.myOverdueLoans = resp.data.data.myOverdueLoans;
+
+                        self.indexData.myContractYear = resp.data.data.myContractYear;
+                        self.indexData.myReceiveMonth = resp.data.data.myReceiveMonth;
+                        self.indexData.myReceiveYear  = resp.data.data.myReceiveYear;
                     }else{
                         ding.toast(resp.data.msg)
                     }

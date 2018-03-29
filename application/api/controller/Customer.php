@@ -32,7 +32,7 @@ class Customer extends Base
     {
         $userId               = input('userId');
         $belongUserName       = input('belongUserName');
-        $type                 = input('type/d', 1);                      //1:终端  2:厂家
+        $type                 = input('type/d', 1);                      //1:终端  2:厂家  3:代理商  4:代理人
         $code                 = input('code', '');                       //客户编号
         $name                 = input('name');                           //客户名称
         $province             = input('province', '');                   //省
@@ -42,7 +42,7 @@ class Customer extends Base
         $explain              = input('explain', '');                    //其他情况说明
         $intermediaryCompany  = input('intermediaryCompany', '');        //中间公司
         $mainPersonnel        = input('mainPersonnel/a', []);            //主要人员{'duties':'','name':'','phone':'','remarks':''}
-        $salesFunnel          = input('salesFunnel', '');                 //销售漏斗
+        $salesFunnel          = input('salesFunnel', '');                //销售漏斗
         $abbreviation         = input('abbreviation', '');               //简称
         $legalRepresentative  = input('legalRepresentative', '');        //法定代表人
         $registeredCapital    = input('registeredCapital', '');          //注册资金
@@ -81,6 +81,9 @@ class Customer extends Base
             'lastTime'             => time(),                    //最后一次沟通时间
             'applyNum'             => 0,                         //跟进数
             'create'               => time(),                    //创建时间
+
+
+
         ];
         $this->mod->add($insertData);
         return json(ok());

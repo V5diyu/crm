@@ -85,6 +85,13 @@ class Index extends Controller
     {
         return view('order');
     }
+
+    //借用信息
+    public function lend ()
+    {
+        return view('lend');
+    }
+
     // 订单查询详情
     public function orderDetail()
     {

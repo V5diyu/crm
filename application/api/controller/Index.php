@@ -16,6 +16,8 @@ class Index extends Base
     private $mod_companyStatistics;
     private $mod_orderInfoData;
     private $mod_remind;
+    private $mod_salespersonReceive;
+
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class Index extends Base
         $this->mod_companyStatistics     = new \CompanyStatisticsDB();
         $this->mod_orderInfoData         = new \OrderInfoDataDB();
         $this->mod_remind                = new \RemindDB();
+        $this->mod_salespersonReceive    = new \SalespersonReceiveDB();
     }
 
     public function index()
@@ -37,20 +40,41 @@ class Index extends Base
         $userName          = $userInfo['name'];
         $time              = date('Y-m');
         $time_y            = date('Y');
-        $companyStatistics = $this->mod_companyStatistics->getInfo(['time' => $time]);
+        $companyStatistics = $this->mod_companyStatistics->getInfo(['time' => $time]);              //公司当月的订单数据
+
+
         if ($isCharge == 2) {
-            $userStatistics_y    = $this->mod_salespersonStatistics->get(['time_y' => $time_y]);
-            $userStatistics_data = $this->mod_salespersonStatistics->get([]);
+            $userStatistics_y    = $this->mod_salespersonStatistics->get(['time_y' => $time_y]);    //公司当年的订单数据
+            $userStatistics_data = $this->mod_salespersonStatistics->get([]);                       //公司全部的订单数据
+            $userReceive_y       = $this->mod_salespersonReceive->get(['time_y'=> $time_y]);        //公司当年的回款数据
+            $userReceive_m       = $this->mod_salespersonReceive->get(['time' => $time]);           //公司当月的回款数据
 
             $ranking               = 0;
             $myContractVolume      = 0;
-            $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';
+            $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';                                             //公司当月的订单->签约额
+
+            //===公司当年签约额
+            $myContractVolumeYear = array_sum(array_column(iterator_to_array($userStatistics_y), 'myContractVolume'));
+            //===
+
+            //===公司当月回款额
+            $myReceiveMonth   = array_sum(array_column(iterator_to_array($userReceive_m),''));
+            //===
+
+            //===公司当年回款额
+            $myReceiveYear    = array_sum(array_column(iterator_to_array($userReceive_y),''));
+            //===
+
             $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));
+                                                                                                    //公司当年的订单->回款额
+
             $myReceivables         = array_sum(array_column(iterator_to_array($userStatistics_data), 'myReceivables'));
             $myOverdueLoans        = $this->mod_orderInfoData->getOverdueLoansByName('');
         }
         else {
+            //销售个人当月的订单数据
             $userStatistics = $this->mod_salespersonStatistics->getInfo(['name' => $userName, 'time' => $time]);
+
             if (empty($userStatistics)) {
                 $ranking               = '';
                 $myContractVolume      = 0;
@@ -58,19 +82,55 @@ class Index extends Base
                 $myReturnAmount        = 0;
                 $myReceivables         = 0;
                 $myOverdueLoans        = 0;
-            }
-            else {
+                $myContractVolumeYear  = 0;
+                $myReceiveMonth        = 0;
+                $myReceiveYear         = 0;
+            } else {
+                //销售个人当年的订单数据
                 $userStatistics_y      = $this->mod_salespersonStatistics->get([
                     'name'   => $userName,
                     'time_y' => $time_y
                 ]);
+                //===销售个人当月的回款数据
+                $userReceive_m     = $this->mod_salespersonReceive->get([
+                    'name'   => $userName,
+                    'time'   => $time
+                ]);
+                //===
+
+                //===销售个人当年的回款数据
+                $userReceive_y       = $this->mod_salespersonReceive->get([
+                    'name'   => $userName,
+                    'time_y' => $time_y
+                ]);
+                //===
+
+
+                //销售的全部数据
                 $userStatistics_data   = $this->mod_salespersonStatistics->get(['name' => $userName]);
+
                 $ranking               = $this->mod_salespersonStatistics->count([
                         'myContractVolume' => ['$gt' => $userStatistics['myContractVolume']],
                         'time'             => $time
                     ]) + 1;
+
+                //销售月签约额
                 $myContractVolume      = $userStatistics['myContractVolume'];
+                //公司当月的签约额
                 $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';
+
+                //===销售当年签约额
+                $myContractVolumeYear  =  array_sum(array_column(iterator_to_array($userStatistics_y),'myContractVolume'));
+                //===
+
+                //===销售当月回款额
+                $myReceiveMonth        = array_sum(array_column(iterator_to_array($userReceive_m), ''));
+                //===
+
+                //销售当年回款额
+                $myReceiveYear         = array_sum(array_column(iterator_to_array($userReceive_y), ''));
+                //===
+
                 $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));
                 $myReceivables         = array_sum(array_column(iterator_to_array($userStatistics_data), 'myReceivables'));
                 $myOverdueLoans        = $this->mod_orderInfoData->getOverdueLoansByName($userName);
@@ -109,7 +169,10 @@ class Index extends Base
             'ranking'               => $ranking,
             'myContractVolume'      => $myContractVolume,
             'companyContractVolume' => $companyContractVolume,
-            'myReturnAmount'        => $myReturnAmount,
+            'myContractYear'        => $myContractVolumeYear,           //公司当年签约额
+            'myReceiveMonth'        => $myReceiveMonth,                 //月回款额
+            'myReceiveYear'         => $myReceiveYear,                  //年回款额
+            'myReturnAmount'        => $myReturnAmount,                 //回款额原计算方式
             'myReceivables'         => $myReceivables,
             'myOverdueLoans'        => $myOverdueLoans,
             'remind'                => [
@@ -178,20 +241,39 @@ class Index extends Base
             $time      = date('Y-m', $timestamp);
         }
         $time_y            = date('Y');
-        $companyStatistics = $this->mod_companyStatistics->getInfo(['time' => $time]);
+
+        $companyStatistics = $this->mod_companyStatistics->getInfo(['time' => $time]);              //公司当月订单数据
+
         if ($isCharge == 2) {
-            $userStatistics_y    = $this->mod_salespersonStatistics->get(['time_y' => $time_y]);
-            $userStatistics_data = $this->mod_salespersonStatistics->get([]);
+
+            $userStatistics_y    = $this->mod_salespersonStatistics->get(['time_y' => $time_y]);    //公司当年的订单数据
+            $userStatistics_data = $this->mod_salespersonStatistics->get([]);                       //公司全部的订单数据
+            $userReceive_y       = $this->mod_salespersonReceive->get(['time_y'=> $time_y]);        //公司当年的回款数据
+            $userReceive_m       = $this->mod_salespersonReceive->get(['time' => $time]);           //公司当月的回款数据
 
             $ranking               = 0;
             $myContractVolume      = 0;
+            //公司当月签约额
             $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';
+
+            //===公司当年签约额
+            $myContractVolumeYear = array_sum(array_column(iterator_to_array($userStatistics_y), 'myContractVolume'));
+            //===
+
+            //===公司当月回款额
+            $myReceiveMonth   = array_sum(array_column(iterator_to_array($userReceive_m),''));
+            //===
+
+            //===公司当年回款额
+            $myReceiveYear    = array_sum(array_column(iterator_to_array($userReceive_y),''));
+            //===
+
             $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));
             $myReceivables         = array_sum(array_column(iterator_to_array($userStatistics_data), 'myReceivables'));
             $myOverdueLoans        = $this->mod_orderInfoData->getOverdueLoansByName('');
         }
         else {
-            $userStatistics = $this->mod_salespersonStatistics->getInfo(['name' => $userName, 'time' => $time]);
+            $userStatistics = $this->mod_salespersonStatistics->getInfo(['name' => $userName, 'time' => $time]);    //销售当月的订单数据
             if (empty($userStatistics)) {
                 $ranking               = '';
                 $myContractVolume      = 0;
@@ -199,19 +281,55 @@ class Index extends Base
                 $myReturnAmount        = 0;
                 $myReceivables         = 0;
                 $myOverdueLoans        = 0;
+                $myContractVolumeYear  = 0;
+                $myReceiveMonth        = 0;
+                $myReceiveYear         = 0;
             }
             else {
+                //销售当年订单数据
                 $userStatistics_y      = $this->mod_salespersonStatistics->get([
                     'name'   => $userName,
                     'time_y' => $time_y
                 ]);
+
+                //===销售个人当月的回款数据
+                $userReceive_m     = $this->mod_salespersonReceive->get([
+                    'name'   => $userName,
+                    'time'   => $time
+                ]);
+                //===
+
+                //===销售个人当年的回款数据
+                $userReceive_y       = $this->mod_salespersonReceive->get([
+                    'name'   => $userName,
+                    'time_y' => $time_y
+                ]);
+                //===
+
+                //销售全部的订单数据
                 $userStatistics_data   = $this->mod_salespersonStatistics->get(['name' => $userName]);
+
                 $ranking               = $this->mod_salespersonStatistics->count([
                         'myContractVolume' => ['$gt' => $userStatistics['myContractVolume']],
                         'time'             => $time
                     ]) + 1;
+                //销售当月签约额
                 $myContractVolume      = $userStatistics['myContractVolume'];
+                //公司当月签约额
                 $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';
+
+                //===销售当年签约额
+                $myContractVolumeYear  =  array_sum(array_column(iterator_to_array($userStatistics_y),'myContractVolume'));
+                //===
+
+                //===销售当月回款额
+                $myReceiveMonth        = array_sum(array_column(iterator_to_array($userReceive_m), ''));
+                //===
+
+                //销售当年回款额
+                $myReceiveYear         = array_sum(array_column(iterator_to_array($userReceive_y), ''));
+                //===
+
                 $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));
                 $myReceivables         = array_sum(array_column(iterator_to_array($userStatistics_data), 'myReceivables'));
                 $myOverdueLoans        = $this->mod_orderInfoData->getOverdueLoansByName($userName);
@@ -222,11 +340,24 @@ class Index extends Base
             'ranking'               => $ranking,
             'myContractVolume'      => $myContractVolume,
             'companyContractVolume' => $companyContractVolume,
+            'myContractYear'        => $myContractVolumeYear,           //公司当年签约额
+            'myReceiveMonth'        => $myReceiveMonth,                 //月回款额
+            'myReceiveYear'         => $myReceiveYear,                  //年回款额
             'myReturnAmount'        => $myReturnAmount,
             'myReceivables'         => $myReceivables,
             'myOverdueLoans'        => $myOverdueLoans,
 
         ];
         return json(ok($result));
+    }
+
+
+    public function statisticsCheck ()
+    {
+        $time   = date('Y-m');
+        $time_y = date('Y');
+        $userStatistics_data = $this->mod_salespersonStatistics->get([]);
+        $myReceivables = array_sum(array_column(iterator_to_array($userStatistics_data), 'myReceivables'));
+        dump($myReceivables);
     }
 }

@@ -15,6 +15,8 @@ class Customer extends Base
     private $mod_record;
     private $mod_apply;
     private $mod_salesperson;
+    private $mod_agent;
+    private $mod_agentRecord;
 
     public function __construct()
     {
@@ -22,6 +24,8 @@ class Customer extends Base
         $this->mod_record      = new \CustomerRecordDB();
         $this->mod_apply       = new \ApplyDB();
         $this->mod_salesperson = new \SalespersonDB();
+        $this->mod_agent       = new \AgentDB();
+        $this->mod_agentRecord = new \AgentRecordDB();
     }
 
     public function uploadExcel()
@@ -70,6 +74,11 @@ class Customer extends Base
                     'lastTime'             => time(),            //最后一次沟通时间
                     'applyNum'             => 0,                 //跟进数
                     'create'               => time(),            //创建时间
+
+
+                    'proxyLevel'           => '',               //Customer表中缺少的数据
+                    'flag'                 => 'customer',       //Customer表中缺少的数据
+
                 ];
                 $list[]       = $item;
                 $userIdList[] = $v[0];
@@ -92,8 +101,8 @@ class Customer extends Base
         }
         $file_name    = $_FILES['file']['tmp_name'];
         $objReader    = \PHPExcel_IOFactory::createReader(\PHPExcel_IOFactory::identify($file_name));
-        $obj_PHPExcel = $objReader->load($file_name);  //加载文件内容,编码utf-8
-        $excel_array  = $obj_PHPExcel->getsheet(0)->toArray();   //转换为数组格式
+        $obj_PHPExcel = $objReader->load($file_name);               //加载文件内容,编码utf-8
+        $excel_array  = $obj_PHPExcel->getsheet(0)->toArray();      //转换为数组格式
         $arr_title    = array_shift($excel_array);
         if (!isset($arr_title[9]) || empty($arr_title[9]) || $arr_title[9] != '跟进销售员') {
             return json(error('excel格式不正确'));
@@ -103,30 +112,33 @@ class Customer extends Base
             if (isset($v[1]) && !empty($v[1] && isset($v[9]) && !empty($v[9]))) {
                 $item         = [
                     'id'                   => getUuid(),
-                    'type'                 => 2,                 //1:终端  2:厂家
-                    'code'                 => $v[0],             //客户编号
-                    'name'                 => $v[1],             //客户名称
-                    'abbreviation'         => $v[2],             //简称
-                    'legalRepresentative'  => $v[3],             //法定代表人
-                    'address'              => $v[4],             //地址
-                    'registeredCapital'    => $v[5],             //注册资金
-                    'lastYearSales'        => $v[6],             //去年年销售额
-                    'customerRating'       => $v[7],             //客户评级
-                    'explain'              => $v[8],             //其他情况说明
-                    'province'             => '',                //省
-                    'city'                 => '',                //市
-                    'stage'                => '',                //客户阶段
-                    'intermediaryCompany'  => '',                //中间公司
-                    'mainPersonnel'        => [],                //主要人员{'duties':'','name':'','phone':'','remarks':''}
-                    'salesFunnel'          => '',                //销售漏斗
-                    'cooperationSituation' => '',                //去年合作收入
+                    'type'                 => 2,                    //1:终端  2:厂家
+                    'code'                 => $v[0],                //客户编号
+                    'name'                 => $v[1],                //客户名称
+                    'abbreviation'         => $v[2],                //简称
+                    'legalRepresentative'  => $v[3],                //法定代表人
+                    'address'              => $v[4],                //地址
+                    'registeredCapital'    => $v[5],                //注册资金
+                    'lastYearSales'        => $v[6],                //去年年销售额
+                    'customerRating'       => $v[7],                //客户评级
+                    'explain'              => $v[8],                //其他情况说明
+                    'province'             => '',                   //省
+                    'city'                 => '',                   //市
+                    'stage'                => '',                   //客户阶段
+                    'intermediaryCompany'  => '',                   //中间公司
+                    'mainPersonnel'        => [],                   //主要人员{'duties':'','name':'','phone':'','remarks':''}
+                    'salesFunnel'          => '',                   //销售漏斗
+                    'cooperationSituation' => '',                   //去年合作收入
                     'belongUserId'         => empty($v[9]) ? [] : explode(',', $v[9]),                //跟进销售员id
                     'belongUserName'       => $v[9],                //跟进销售员name
-                    'lastRecord'           => [],                //最后一条沟通记录
-                    'lastProgramme'        => [],                //最后一条跟踪方案
-                    'lastTime'             => time(),            //最后一次沟通时间
-                    'applyNum'             => 0,                 //跟进数
-                    'create'               => time(),            //创建时间
+                    'lastRecord'           => [],                   //最后一条沟通记录
+                    'lastProgramme'        => [],                   //最后一条跟踪方案
+                    'lastTime'             => time(),               //最后一次沟通时间
+                    'applyNum'             => 0,                    //跟进数
+                    'create'               => time(),               //创建时间
+
+                    'proxyLevel'           => '',                   //Customer表中缺少的数据
+                    'flag'                 => 'customer',           //Customer表中缺少的数据
                 ];
                 $list[]       = $item;
                 $userIdList[] = $v[0];
@@ -162,30 +174,34 @@ class Customer extends Base
             return json(error('缺少必要参数'));
         }
         $insertData = [
-            'type'                 => $type,                     //1:终端  2:厂家
+            'type'                 => $type,                    //1:终端  2:厂家
             'code'                 => $code,
-            'name'                 => $name,                     //客户名称
-            'province'             => $province,                 //省
-            'city'                 => $city,                     //市
-            'address'              => $address,                  //地址
-            'stage'                => $stage,                    //客户阶段
-            'explain'              => $explain,                  //其他情况说明
-            'intermediaryCompany'  => $intermediaryCompany,      //中间公司
-            'mainPersonnel'        => $mainPersonnel,            //主要人员{'duties':'','name':'','phone':'','remarks':''}
-            'salesFunnel'          => $salesFunnel,              //销售漏斗
-            'abbreviation'         => $abbreviation,             //简称
-            'legalRepresentative'  => $legalRepresentative,      //法定代表人
-            'registeredCapital'    => $registeredCapital,        //注册资金
-            'lastYearSales'        => $lastYearSales,            //去年年销售额
-            'customerRating'       => $customerRating,           //客户评级
-            'cooperationSituation' => $cooperationSituation,     //去年合作收入
-            'belongUserId'         => [],                        //跟进销售员id
-            'belongUserName'       => '',                        //跟进销售员name
-            'lastRecord'           => [],                        //最后一条沟通记录
-            'lastProgramme'        => [],                        //最后一条跟踪方案
-            'lastTime'             => time(),            //最后一次沟通时间
-            'applyNum'             => 0,                         //跟进数
-            'create'               => time(),                    //创建时间
+            'name'                 => $name,                    //客户名称
+            'province'             => $province,                //省
+            'city'                 => $city,                    //市
+            'address'              => $address,                 //地址
+            'stage'                => $stage,                   //客户阶段
+            'explain'              => $explain,                 //其他情况说明
+            'intermediaryCompany'  => $intermediaryCompany,     //中间公司
+            'mainPersonnel'        => $mainPersonnel,           //主要人员{'duties':'','name':'','phone':'','remarks':''}
+            'salesFunnel'          => $salesFunnel,             //销售漏斗
+            'abbreviation'         => $abbreviation,            //简称
+            'legalRepresentative'  => $legalRepresentative,     //法定代表人
+            'registeredCapital'    => $registeredCapital,       //注册资金
+            'lastYearSales'        => $lastYearSales,           //去年年销售额
+            'customerRating'       => $customerRating,          //客户评级
+            'cooperationSituation' => $cooperationSituation,    //去年合作收入
+            'belongUserId'         => [],                       //跟进销售员id
+            'belongUserName'       => '',                       //跟进销售员name
+            'lastRecord'           => [],                       //最后一条沟通记录
+            'lastProgramme'        => [],                       //最后一条跟踪方案
+            'lastTime'             => time(),                   //最后一次沟通时间
+            'applyNum'             => 0,                        //跟进数
+            'create'               => time(),                   //创建时间
+
+            'proxyLevel'           => '',                       //Customer表中缺少的数据
+            'flag'                 => 'customer',               //Customer表中缺少的数据
+
         ];
         $this->mod->add($insertData);
         return json(ok());
@@ -460,15 +476,17 @@ class Customer extends Base
         $pn          = input('pn/d', 1);
         $ps          = 15;
         $start       = ($pn - 1) * $ps;
+        $sort        = ['create' => -1];
+
         $accountInfo = $this->getUserInfo();
         if ($accountInfo['setUp'] == 2 || $accountInfo['setUp'] == 3) {
             return json(error('权限不足'));
         }
-        $where = [];
+        $where = ['type' => 1 ];
         if ($accountInfo['setUp'] == 4) {
             $where['userName'] = $accountInfo['name'];
         }
-        $data_record  = $this->mod_record->get($where, $start, $ps);
+        $data_record  = $this->mod_record->get($where, $start, $ps, $sort);
         $count_record = $this->mod_record->count($where);
 
         $customerIds = array_column(iterator_to_array($data_record), 'customerId');
@@ -481,7 +499,8 @@ class Customer extends Base
         $list_record = [];
         foreach ($data_record as $item) {
             $customerName   = isset($list[$item['customerId']]) ? $list[$item['customerId']]['name'] : '';
-            $item['status'] = $item['status'] == 1 ? '仅自己可见' : '所有人可见';
+            //$item['status'] = $item['status'] == 1 ? '仅自己可见' : '所有人可见';
+            $item['status'] = empty($item['status']) ? '' : ($item['status'] == 1 ? '仅自己可见' : '所有人可见' );
             $item['cName']  = $customerName;
             $list_record[]  = $item;
         }
@@ -567,6 +586,82 @@ class Customer extends Base
             $this->mod_record->update(['create' => strtotime($item['time'])], $item['id']);
         }
         return json(ok());
+    }
+
+    public function updateCustomerRecord()
+    {
+        $data = $this->mod_record->get();
+        foreach ($data as $record_item) {
+            $id = $record_item['id'];
+            $type = 1;
+
+            $this->mod_record->update([
+                'type' => $type
+            ],$id);
+        }
+    }
+
+    public function updateCustomer ()
+    {
+        /*$customer_data = $this->mod->get();
+
+        $proxyLevel = '';
+        $flag       = 'customer';
+
+        foreach ($customer_data as $customer_item) {
+            $id = $customer_item['id'];
+            $this->mod->update([
+                'proxyLevel'    => $proxyLevel,
+                'flag'          => $flag,
+            ],$id);
+        }*/
+    }
+
+    public function mergeTable()
+    {
+        $agent_data = $this->mod_agent->get();
+        $list_agent_data = [];
+        foreach ($agent_data as $agent_item) {
+
+            if ($agent_item['type'] === 1) {
+                $agent_item['type'] = 3;
+            } else if ($agent_item['type'] === 2) {
+                $agent_item['type'] = 4;
+            }
+            $agent_item['city']                 = '';
+            $agent_item['cooperationSituation'] = '';
+            $agent_item['customerRating']       = '';
+            $agent_item['intermediaryCompany']  = '';
+            $agent_item['lastProgramme']        = '';
+            $agent_item['province']             = '';
+            $agent_item['salesFunnel']          = '';
+            $agent_item['stage']                = '';
+
+            $list_agent_data[] = $agent_item;
+        }
+        dump(count($list_agent_data));
+        /*if (!empty($list_agent_data)) {
+            $this->mod->batchInsert($list_agent_data);
+        }*/
+    }
+
+
+    public function mergeRecord ()
+    {
+        $data = $this->mod_agentRecord->get();
+        $list_record_data = [];
+        foreach ($data as $record_item) {
+
+            $list_record_data[] = $record_item;
+
+        }
+
+        //dump(count($list_record_data));
+        if (!empty($list_record_data) ) {
+            dump(count($list_record_data));
+            //$this->mod_record->batchInsert($list_record_data);
+        }
+
     }
 
 }

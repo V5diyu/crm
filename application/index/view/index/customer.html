@@ -9,6 +9,7 @@
     <meta http-equiv="Pragma" CONTENT="no-cache">
     <title>客户</title>
     <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/mobile/iconfont/iconfont1.css">
     <link rel="stylesheet" type="text/css" href="/static/css/common.css">
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
 </head>
@@ -141,14 +142,22 @@
             <i class="iconfont icon-gongzuotai1"></i>
             <p>工作台</p>
         </a>
+        <a class="nav-item" href="/index/index/order">
+            <i class="iconfont icon-zichanxinxibuquancelve"></i>
+            <p>订单查询</p>
+        </a>
+        <a class="nav-item" href="/index/index/lend">
+            <i class="iconfont icon-jihua"></i>
+            <p>借用</p>
+        </a>
         <a class="nav-item nav-active" href="/index/index/customer">
             <i class="iconfont icon-category"></i>
             <p>客户</p>
         </a>
-        <a class="nav-item" href="/index/index/agent">
+        <!--<a class="nav-item" href="/index/index/agent">
             <i class="iconfont icon-dailishangguanli"></i>
             <p>代理商</p>
-        </a>
+        </a>-->
         <a v-if="userInfo.roleName === '主管'" href="/index/index/managerRecord" class="nav-item">
             <i class="iconfont icon-chanpin"></i>
             <p>沟通记录</p>

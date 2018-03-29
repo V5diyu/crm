@@ -477,8 +477,8 @@ class OrderInfo extends Base
     public function update()
     {
         $id         = input('id');
-        $A_hth      = input('A_hth');           //合同号
-        $B_htqyrq   = input('B_htqyrq');        //合同签约日期
+        $A_hth      = input('A_hth');           //合同号（disabled属性）
+        $B_htqyrq   = input('B_htqyrq');        //合同签约日期（disabled属性）
         $C_ssxm     = input('C_ssxm');          //所属项目
         $D_khdw     = input('D_khdw');          //客户单位
         $E_zj       = input('E_zj/d');          //总价
@@ -487,13 +487,17 @@ class OrderInfo extends Base
         $H_fhbl     = input('H_fhbl/d');        //发货比例
         $I_fp       = input('I_fp');            //发票
         $J_fkje     = input('J_fkje/d');        //付款金额
-        $K_fkbl     = input('K_fkbl/d');        //付款比例
+        //$K_fkbl     = input('K_fkbl/d');          //付款比例
         $L_fkxq     = input('L_fkxq');          //付款详情
-        $M_qkje     = input('M_qkje/d');        //欠款金额
+        //$M_qkje     = input('M_qkje/d');          //欠款金额
         $N_wkdqr    = input('N_wkdqr');         //尾款到期日
         $O_sfcq     = input('O_sfcq');          //是否超期
         $P_cwhxclyj = input('P_cwhxclyj');      //财务后续处理意见
         $Q_xsclfk   = input('Q_xsclfk');        //销售处理反馈
+
+        //付款比例由计算得出(类似处理欠款金额)
+        $K_fkbl     = empty($E_zj) ? 0 : round($J_fkje / $E_zj, 3) * 100 ;
+        $M_qkje     = empty($E_zj) ? 0 : (float)($E_zj - $J_fkje);
 
         if (empty($id) || empty($A_hth) || empty($B_htqyrq)) {
             return json(error('缺少必要参数'));
@@ -515,7 +519,39 @@ class OrderInfo extends Base
             'P_cwhxclyj' => $P_cwhxclyj,    //财务后续处理意见
             'Q_xsclfk'   => $Q_xsclfk,      //销售处理反馈
         ];
+
+
         $this->mod_data->update($setData, $id);
+
+        //合同签约日期不发生修改！！！
+        //订单修改（上述步骤已完成修改），销售统计，公司统计数据都要发生变化！！！
+        //订单修改是单条的，数据修改也是单条的。
+
+        $date_month = date('Y-m',strtotime($B_htqyrq));
+        $date_year  = date('Y',strtotime($B_htqyrq));
+
+        $time_start = strtotime($date_month);
+        $time_end   = strtotime("$date_month +1 month -1 second");
+
+        //公司统计更新
+
+        $company_info = iterator_to_array($this->mod_data->get(['B_htqyrq' => ['$gte' => $time_start, '$lte' => $time_end] ]));
+        $company_sum = array_sum(array_column($company_info, "E_zj"));
+
+        $this->mod_companyStatistics->update(['companyContractVolume'=>$company_sum],['time'=>$date_month]);
+
+        //销售统计更新
+        $sale_man_info = iterator_to_array($this->mod_data->get(['B_htqyrq' => ['$gte' => $time_start, '$lte' => $time_end], 'F_xsry' => $F_xsry ]));
+
+        $set_data = [
+            "myContractVolume" => array_sum(array_column($sale_man_info,"E_zj")),
+            "myReturnAmount" => array_sum(array_column($sale_man_info,"J_fkje")),
+            "myReceivables"  => array_sum(array_column($sale_man_info,"M_qkje"))
+        ];
+
+        $this->mod_salespersonStatistics->update($set_data,['time'=>$date_month,'name'=>$F_xsry]);
+
+
         return json(ok());
     }
 
@@ -533,7 +569,7 @@ class OrderInfo extends Base
         return json(ok());
     }
 
-    public function downfile()
+    public function downfileBak()
     {
         $search    = input('search');           //客户简称
         $startTime = input('startTime');
@@ -562,7 +598,7 @@ class OrderInfo extends Base
 
         $PHPExcel = new \PHPExcel();
         $PHPSheet = $PHPExcel->getActiveSheet();
-        $name     = '订单信息';
+        $name     = '订单信息_' . date('Y-m-d');
         setExcelTitleStyle($PHPSheet, 17);
         $PHPSheet->setCellValue("A1", "合同号")->setCellValue("B1", "合同签约日期")->setCellValue("C1", "所属项目")->setCellValue("D1", "客户单位")->setCellValue("E1", "总价")->setCellValue("F1", "销售人员")->setCellValue("G1", "发货")->setCellValue("H1", "发货比例")->setCellValue("I1", "发票")->setCellValue("J1", "付款金额")->setCellValue("K1", "付款比例")->setCellValue("L1", "付款详情")->setCellValue("M1", "欠款金额")->setCellValue("N1", "尾款到期日")->setCellValue("O1", "是否超期")->setCellValue("P1", "财务后续处理意见")->setCellValue("Q1", "销售处理反馈");
         $PHPSheet->setTitle($name);
@@ -578,6 +614,51 @@ class OrderInfo extends Base
         $PHPWriter->save("php://output");
     }
 
+
+    public function downfile ()
+    {
+        $search    = input('search');           //客户简称
+        $startTime = input('startTime');
+        $endTime   = input('endTime');
+        $where     = [];
+        if (!empty($search)) {
+            $where['$or'] = [
+                ['D_khdw' => ['$regex' => $search, '$options' => 'i']],
+                ['A_hth' => ['$regex' => $search, '$options' => 'i']]
+            ];
+        }
+        if (!empty($startTime) || !empty($endTime)) {
+            $timeWhere = [];
+            if (!empty($startTime)) {
+                $timeWhere['$gte'] = $startTime / 1000;
+            }
+            if (!empty($endTime)) {
+                $timeWhere['$lt'] = $endTime / 1000;
+            }
+            $where['B_htqyrq'] = $timeWhere;
+        }
+        $accountInfo = $this->getUserInfo();
+        if ($accountInfo['setUp'] == 4) {
+            $where['F_xsry'] = $accountInfo['name'];
+        }
+
+        $PHPExcel = new \PHPExcel();
+        $PHPSheet = $PHPExcel->getActiveSheet();
+        $name     = '订单信息_' . date('Y-m-d');
+        setExcelTitleStyle($PHPSheet, 16);
+        $PHPSheet->setCellValue("A1", "合同号")->setCellValue("B1", "合同签约日期")->setCellValue("C1", "客户单位")->setCellValue("D1", "总价")->setCellValue("E1", "销售人员")->setCellValue("F1", "发货")->setCellValue("G1", "发货比例")->setCellValue("H1", "发票")->setCellValue("I1", "付款金额")->setCellValue("J1", "付款比例")->setCellValue("K1", "付款详情")->setCellValue("L1", "欠款金额")->setCellValue("M1", "尾款到期日")->setCellValue("N1", "是否超期")->setCellValue("O1", "财务后续处理意见")->setCellValue("P1", "销售处理反馈");
+        $PHPSheet->setTitle($name);
+        $data = $this->mod_data->get($where);
+        $i    = 1;
+        foreach ($data as $item) {
+            $i++;
+            $PHPSheet->setCellValue("A$i", $item['A_hth'])->setCellValue("B$i", date('Y-m-d', $item['B_htqyrq']))->setCellValue("C$i", $item['C_ssxm'])->setCellValue("C$i", $item['D_khdw'])->setCellValue("D$i", $item['E_zj'])->setCellValue("E$i", $item['F_xsry'])->setCellValue("F$i", $item['G_fh'])->setCellValue("G$i", $item['H_fhbl'] . '%')->setCellValue("H$i", $item['I_fp'])->setCellValue("I$i", $item['J_fkje'])->setCellValue("J$i", $item['K_fkbl'] . '%')->setCellValue("K$i", $item['L_fkxq'])->setCellValue("L$i", $item['M_qkje'])->setCellValue("M$i", empty($item['N_wkdqr']) ? '' : date('Y-m-d', $item['N_wkdqr']))->setCellValue("N$i", $item['O_sfcq'])->setCellValue("O$i", $item['P_cwhxclyj'])->setCellValue("P$i", $item['Q_xsclfk']);
+        }
+        $PHPWriter = \PHPExcel_IOFactory::createWriter($PHPExcel, "Excel2007");
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=$name.xlsx");
+        $PHPWriter->save("php://output");
+    }
     //    public function getErrorList()
     //    {
     //        $id = input('id');

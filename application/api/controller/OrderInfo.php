@@ -15,6 +15,9 @@ class OrderInfo extends Base
     private $mod_data;
     private $mod_salesperson;
     private $mod_correctError;
+    private $mod_product;
+    private $mod_payDetail;
+    private $mod_billDetail;
 
     public function __construct()
     {
@@ -22,6 +25,9 @@ class OrderInfo extends Base
         $this->mod_data         = new \OrderInfoDataDB();
         $this->mod_salesperson  = new \SalespersonDB();
         $this->mod_correctError = new \CorrectErrorDB();
+        $this->mod_product      = new \ProductDeliveryDataDB();
+        $this->mod_payDetail    = new \OrderPayDetailDb();
+        $this->mod_billDetail   = new \BillDetailDB();
     }
 
     public function get()
@@ -49,11 +55,14 @@ class OrderInfo extends Base
         foreach ($data as $item) {
             $list[] = [
                 'id'     => $item['id'],
-                'D_khdw' => $item['D_khdw'],
                 'A_hth'  => $item['A_hth'],
                 'C_ssxm' => $item['C_ssxm'],
+                'D_khdw' => $item['D_khdw'],
+                'E_zj'   => $item['E_zj'],
+                'H_fhbl' => $item['H_fhbl'] . '%',
                 'J_fkje' => empty($item['J_fkje']) ? 0 : $item['J_fkje'],
-                'K_fkbl' => round($item['K_fkbl'] * 100, 2) . '%',
+                'K_fkbl' => round($item['K_fkbl'], 3) . '%',
+                'N_wkdqr'=> empty($item['N_wkdqr']) ? '全部发货未完成' : date('Y-m-d',$item['N_wkdqr'])
             ];
         }
         return json(ok($list));
@@ -62,13 +71,46 @@ class OrderInfo extends Base
     public function getInfo()
     {
         $id = input('id');
-        if (empty($id)) {
+        if (empty($id) ) {
             return json(error('缺少必要的参数'));
         }
+        //订单信息
         $info           = $this->mod_data->getInfo($id);
+        $info['G_fh']   = empty($info['G_fh']) ? 0 : $info['G_fh'];
+        $info['H_fhbl'] = round($info['H_fhbl'],3) . '%';
         $info['J_fkje'] = empty($info['J_fkje']) ? 0 : $info['J_fkje'];
-        $info['K_fkbl'] = round($info['K_fkbl'] * 100, 2) . '%';
-        return json(ok($info));
+        $info['K_fkbl'] = round($info['K_fkbl'], 3) . '%';
+        //$info['K_fkbl'] = round($info['K_fkbl'] * 100, 2) . '%';
+
+        $contract = $info['A_hth'];
+        $productDetail  = [];
+        $payDetail      = [];
+        $billDetail     = [];
+        //交期明细信息
+        $product_data   = $this->mod_product->get(['C_gcah' => $contract]);
+        foreach ($product_data as $product_item) {
+
+            //$product_item['N_yjfhrq'] = empty($product_item['N_yjfhrq']) ? '' : $product_item['N_yjfhrq'];
+            if ( is_numeric($product_item['N_yjfhrq'] )) {
+                $product_item['N_yjfhrq'] = date('Y-m-d',$product_item['N_yjfhrq']);
+            }
+            $productDetail[] = $product_item;
+        }
+        //付款明细信息
+        $pay_data       = $this->mod_payDetail->get(['contract' => $contract]);
+        foreach ($pay_data as $pay_item) {
+            $pay_item['paydate'] = date('Y年m月d日 H:i:s',strtotime($pay_item['paydate']['date']));
+            $payDetail[] = $pay_item;
+        }
+        //发票明细信息
+        $bill_data      = $this->mod_billDetail->get(['D_hth' => $contract]);
+        foreach ($bill_data as $bill_item) {
+
+            //时间格式转换
+            $bill_item['C_kpsj'] = date("Y-m-d",$bill_item['C_kpsj']);
+            $billDetail[] = $bill_item;
+         }
+        return json(ok(['order'=>$info, 'productDetail'=>$productDetail, 'payDetail'=>$payDetail, 'billDetail'=> $billDetail]));
     }
 
     public function correctError()
