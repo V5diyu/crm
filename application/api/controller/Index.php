@@ -58,11 +58,11 @@ class Index extends Base
             //===
 
             //===公司当月回款额
-            $myReceiveMonth   = array_sum(array_column(iterator_to_array($userReceive_m),''));
+            $myReceiveMonth   = array_sum(array_column(iterator_to_array($userReceive_m),'receive'));
             //===
 
             //===公司当年回款额
-            $myReceiveYear    = array_sum(array_column(iterator_to_array($userReceive_y),''));
+            $myReceiveYear    = array_sum(array_column(iterator_to_array($userReceive_y),'receive'));
             //===
 
             $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));
@@ -124,11 +124,11 @@ class Index extends Base
                 //===
 
                 //===销售当月回款额
-                $myReceiveMonth        = array_sum(array_column(iterator_to_array($userReceive_m), ''));
+                $myReceiveMonth        = array_sum(array_column(iterator_to_array($userReceive_m), 'receive'));
                 //===
 
                 //销售当年回款额
-                $myReceiveYear         = array_sum(array_column(iterator_to_array($userReceive_y), ''));
+                $myReceiveYear         = array_sum(array_column(iterator_to_array($userReceive_y), 'receive'));
                 //===
 
                 $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));
@@ -261,11 +261,11 @@ class Index extends Base
             //===
 
             //===公司当月回款额
-            $myReceiveMonth   = array_sum(array_column(iterator_to_array($userReceive_m),''));
+            $myReceiveMonth   = array_sum(array_column(iterator_to_array($userReceive_m),'receive'));
             //===
 
             //===公司当年回款额
-            $myReceiveYear    = array_sum(array_column(iterator_to_array($userReceive_y),''));
+            $myReceiveYear    = array_sum(array_column(iterator_to_array($userReceive_y),'receive'));
             //===
 
             $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));
@@ -323,11 +323,11 @@ class Index extends Base
                 //===
 
                 //===销售当月回款额
-                $myReceiveMonth        = array_sum(array_column(iterator_to_array($userReceive_m), ''));
+                $myReceiveMonth        = array_sum(array_column(iterator_to_array($userReceive_m), 'receive'));
                 //===
 
                 //销售当年回款额
-                $myReceiveYear         = array_sum(array_column(iterator_to_array($userReceive_y), ''));
+                $myReceiveYear         = array_sum(array_column(iterator_to_array($userReceive_y), 'receive'));
                 //===
 
                 $myReturnAmount        = array_sum(array_column(iterator_to_array($userStatistics_y), 'myReturnAmount'));

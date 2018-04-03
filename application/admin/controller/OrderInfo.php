@@ -550,8 +550,6 @@ class OrderInfo extends Base
         ];
 
         $this->mod_salespersonStatistics->update($set_data,['time'=>$date_month,'name'=>$F_xsry]);
-
-
         return json(ok());
     }
 

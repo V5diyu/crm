@@ -36,6 +36,8 @@ class OrderInfo extends Base
         $isCharge = input('isCharge/d', 1);  //1:不是 2：是
         $D_khdw   = input('D_khdw');
         $pn       = input('pn/d', 1);
+        $order    = input('order');
+
         $ps       = 15;
         $start    = ($pn - 1) * $ps;
         if (empty($userName)) {
@@ -46,6 +48,11 @@ class OrderInfo extends Base
         }
         else {
             $where = ['F_xsry' => $userName];
+        }
+        if ($order == 1) {
+            $sort = '';
+        } else {
+            $sort = '';
         }
         if (!empty($D_khdw)) {
             $where['D_khdw'] = ['$regex' => $D_khdw, '$options' => 'i'];
@@ -140,5 +147,4 @@ class OrderInfo extends Base
         $this->mod_info->updateInc(['errorNum' => 1, 'errorStatus' => 1], $info['id']);
         return json(ok());
     }
-
 }

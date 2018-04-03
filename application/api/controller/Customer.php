@@ -135,9 +135,28 @@ class Customer extends Base
         }
         $list = [];
         foreach ($data as $item) {
+
+            switch ($item['type']) {
+                case 1:
+                    $item['type'] = '终端';
+                    break;
+                case 2:
+                    $item['type'] = '厂家';
+                    break;
+                case 3:
+                    $item['type'] = '代理商';
+                    break;
+                case 4:
+                    $item['type'] = '代理人';
+                    break;
+                default:
+                    $item['type'] = '终端';
+            }
+
             $list[] = [
                 'id'                  => $item['id'],
-                'type'                => $item['type'] == 1 ? '终端' : '厂家',
+                //'type'                => $item['type'] == 1 ? '终端' : '厂家',
+                'type'                => $item['type'],
                 'name'                => $item['name'],
                 'legalRepresentative' => $item['legalRepresentative'],
                 'address'             => $item['address'],
@@ -303,7 +322,8 @@ class Customer extends Base
         $list_record = [];
         foreach ($data_record as $item) {
             $customerName   = isset($list[$item['customerId']]) ? $list[$item['customerId']]['name'] : '';
-            $item['status'] = $item['status'] == 1 ? '仅自己可见' : '所有人可见';
+            //$item['status'] = $item['status'] == 1 ? '仅自己可见' : '所有人可见';
+            $item['status'] = empty($item['status']) ? '' : ($item['status'] == 1 ? '仅自己可见' : '所有人可见' );
             $item['cName']  = $customerName;
             $list_record[]  = $item;
         }
@@ -450,6 +470,65 @@ class Customer extends Base
         $this->mod_apply->add($insertData);
         $this->mod->updateInc(['applyNum' => 1], $id);
         return json(ok());
+    }
+
+
+
+    public function indexRecordAdd ()
+    {
+        $userId     = input('userId');      //
+        $userName   = input('username');    //
+        $recordList = input('recordList');  //多条记录情况
+        $record_list = [];
+
+        if (empty($recordList)) {
+            return json(error('未接收到内容'));
+        }
+        foreach ($recordList as $recordItem) {
+
+            if (empty($recordItem['customer']) || empty($recordItem['customerName']) || empty($recordItem['remark'])) {
+                continue;
+            }
+            $where['$or'] = [
+                    ['abbreviation' => ['$regex' => $recordItem['customer'], '$options' => 'i'] ],
+                    ['name'         => ['$regex' => $recordItem['customer'], '$options' => 'i'] ]
+            ];
+            $customer_data = $this->mod->getInfo($where);
+
+            if (!empty($customer_data)) {
+                $record_list[] = [
+                    'id'            => $customer_data['id'],
+                    'userId'        => $userId,
+                    'userName'      => $userName,
+                    'customerId'    => $customer_data['id'],
+                    'customerName'  => $recordItem['customerName'],
+                    'title'         => '',
+                    'time'          => date('Y-m-d H:i:s'),
+                    'remark'        => $recordItem['remark'],
+                    'status'        => 1,
+                    'create'        => time(),
+                    'type'          => 1
+                ];
+            }
+
+        }
+
+        if (!empty($record_list)) {
+            //$this->mod_record->batchInsert($record_list);
+        }
+
+        //return json(ok($record_list));
+        return json(ok($recordList));
+
+    }
+
+    public function testId ()
+    {
+        /*$data = $this->mod->getInfo(['name'=> '湖南创世智能科技有限公司']);*/
+        $data = 15120549010377588;
+        $data = dechex($data);
+
+        return json(ok($data));
     }
 
 }

@@ -12,25 +12,12 @@
     <link rel="stylesheet" type="text/css" href="/mobile/iconfont/iconfont1.css">
     <link rel="stylesheet" type="text/css" href="/static/css/common.css">
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/modify.css">
 </head>
 <body>
 <div class="container index nav-fixed-bottom" id="app" v-cloak>
-    <!--<div class="header">
-        <a class="item" href="/index/index/productTime">
-            <img src="/static/img/icon-jiaoqi.png">
-            <p>产品交期</p>
-        </a>
-        <a class="item" href="/index/index/order">
-            <img src="/static/img/icon-dingdan.png">
-            <p>订单查询</p>
-        </a>
-        <a class="item" href="/index/index/invoice">
-            <img src="/static/img/icon-xiaoxiang.png">
-            <p>销项发票</p>
-        </a>
-    </div>-->
 
-    <div class="own">
+    <div class="statistics">
         <div class="top">
             <div class="left">
                 <span class="headimg" v-if="userInfo.avatar" :style="{'background-image': 'url('+userInfo.avatar + ')'}"></span>
@@ -133,7 +120,7 @@
         </div>
     </a>
 
-    <div class="ranking">
+    <!--<div class="ranking">
         <div class="top">
             <div class="left">月签约额排行榜</div>
 
@@ -155,6 +142,38 @@
                     {{item.name.substr(item.name.length-1, 1)}}
                 </span>
                 <span class="name">{{item.name}}</span>
+                &lt;!&ndash;<span class="sum">{{item.myContractVolume}}</span>&ndash;&gt;
+            </div>
+        </div>
+
+        <div class="no-data" v-show="indexData.rankingList.length == 0">暂无数据</div>
+
+        <a class="more" href="/index/index/ranking">
+            <span>更多</span>
+        </a>
+    </div>-->
+    <div class="charts">
+        <div class="top">
+            <div class="left">月签约额排行榜</div>
+
+            <div class="right">
+                <div class="select" @click="rankingTime">
+                    <div class="current">
+                        <span class="txt">{{curRankingTimeOption.key}}</span>
+                        <i class="iconfont icon-unfold"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list">
+            <div class="item" v-for="(item,index) in indexData.rankingList" style="width:30%;">
+                <span class="num">{{++index}} . </span>
+                <!--<span class="img" v-if="item.avatar" :style="{'background-image': 'url('+item.avatar + ')'}"></span>
+                <span class="img" v-if="!item.avatar">
+                    {{item.name.substr(item.name.length-1, 1)}}
+                </span>-->
+                <span class="name">{{item.name}}</span>
                 <!--<span class="sum">{{item.myContractVolume}}</span>-->
             </div>
         </div>
@@ -165,6 +184,31 @@
             <span>更多</span>
         </a>
     </div>
+
+    <!--<div class="record">
+        <div class="top">
+            <div class="left">添加沟通记录</div>
+        </div>
+        <div class="list" v-for="(item, index) in recordList">
+            <div class="item">
+                <span class="txt">客户名称</span>
+                <input type="text" v-model="item.customer">
+            </div>
+            <div class="item">
+                <span class="txt">沟通对象</span>
+                <input type="text" v-model="item.customerName">
+            </div>
+            <div class="item-bt">
+                <span class="txt">沟通内容</span>
+                <input type="text" v-model="item.remark">
+            </div>
+        </div>
+
+        <div class="btn">
+            <button class="bt-left" @click="addRecord">添加新纪录</button>
+            <button class="bt-right" @click="submit">提交记录</button>
+        </div>
+    </div>-->
 
     <div class="nav" v-if="userInfo.userid">
         <a class="nav-item nav-active" href="/index/index">
@@ -187,7 +231,7 @@
             <i class="iconfont icon-dailishangguanli"></i>
             <p>代理商</p>
         </a>-->
-        <a v-if="userInfo.roleName === '主管'" href="/index/index/managerRecord" class="nav-item">
+        <a v-if="userInfo.roleName === '主管'" href="/index/index/customerRecord" class="nav-item">
             <i class="iconfont icon-chanpin"></i>
             <p>沟通记录</p>
         </a>
@@ -233,7 +277,8 @@
             curRankingTimeOption: {
                 key: '本月',
                 value: '1'
-            }
+            },
+            recordList : [{}]
         },
         methods: {
             selectOwnTime: function(){
@@ -315,7 +360,72 @@
                         ding.toast(resp.data.msg)
                     }
                 })
+            },
+            submit: function(){
+                var self =this;
+                alert(self.recordList[0]['customer']);
+                var formData = {
+                    'userId'    : self.userInfo.userid,
+                    'username'  : self.userInfo.name,
+                    'isCharge'  : self.userInfo.isCharge,
+                    'recordList': self.recordList
+                };
+                alert(self.recordList.length);
+                /*ajax.post('/api/customer/indexRecordAdd',{}, function (resp) {
+                alert(123);
+                ding.toast('添加成功');
+
+                });*/
+                /*ajax.post(
+                    '/api/customer/indexRecordAdd',
+                    {
+                        'userId'    : self.userInfo.userid,
+                        'username'  : self.userInfo.name,
+                        'isCharge'  : self.userInfo.isCharge,
+                        'recordList': self.recordList
+                    },
+                    function (resp) {
+                    /!*self.initData(self.form.type);*!/
+                    alert(123);
+                    alert(resp.data);
+                    self.recordList = [{}];
+                    ding.toast('添加成功');
+                    /!*setTimeout(function(){
+                        history.back();
+                    }, 2000)*!/
+                });*/
+                /*$.ajax({
+                    url: '/api/customer/indexRecordAdd',
+                    type: 'post',
+                    data: formData,
+                    cache: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        alert(data);
+                    }
+                });*/
+                /*axios.get('/api/customer/indexRecordAdd', {
+                    params: {
+                        'userId'    : self.userInfo.userid,
+                        'username'  : self.userInfo.name,
+                        'isCharge'  : self.userInfo.isCharge,
+                        'recordList': self.recordList
+                    }
+                }).then(function (resp) {
+                    if (resp.data.ret) {
+                        //self.indexData = resp.data.data;
+                        alert('after');
+                        ding.toast('添加成功');
+                    }else{
+                        ding.toast(resp.msg)
+                    }
+                    alert(resp);
+                });*/
+            },
+            addRecord : function () {
+                this.recordList.push({});
             }
+
         },
         created: function(){
             var self = this;
@@ -326,7 +436,6 @@
                     self.getData();
                 });
             });
-
         }
     })
 </script>

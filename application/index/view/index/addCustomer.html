@@ -84,36 +84,12 @@
                     <input type="text" v-model="form.name">
                 </div>
                 <div class="item">
-                    <span class="txt">编号</span>
-                    <input type="text" v-model="form.code">
-                </div>
-                <div class="item">
                     <span class="txt">简称</span>
                     <input type="text" v-model="form.abbreviation">
                 </div>
                 <div class="item">
-                    <span class="txt">法定代表人</span>
-                    <input type="text" v-model="form.legalRepresentative">
-                </div>
-                <div class="item">
-                    <span class="txt">地址</span>
-                    <input type="text" v-model="form.address">
-                </div>
-                <div class="item">
-                    <span class="txt">注册资金/万</span>
-                    <input type="number" v-model="form.registeredCapital">
-                </div>
-                <div class="item">
-                    <span class="txt">去年年销售额</span>
-                    <input type="number" v-model="form.lastYearSales">
-                </div>
-                <!--<div class="item">-->
-                    <!--<span class="txt">去年合作收入</span>-->
-                    <!--<input type="number" v-model="form.cooperationSituation">-->
-                <!--</div>-->
-                <div class="item">
-                    <span class="txt">客户评级</span>
-                    <input type="text" v-model="form.customerRating">
+                    <span class="txt">编号</span>
+                    <input type="text" v-model="form.code">
                 </div>
                 <div class="item">
                     <span class="txt">其他情况说明</span>
@@ -123,6 +99,32 @@
                     <span class="txt">跟进销售人员</span>
                     <input type="text" v-model="form.belongUserName">
                 </div>
+
+                <!--<div class="item">
+                    <span class="txt">法定代表人</span>
+                    <input type="text" v-model="form.legalRepresentative">
+                </div>-->
+                <!-- <div class="item">
+                    <span class="txt">地址</span>
+                    <input type="text" v-model="form.address">
+                </div>-->
+                <!--<div class="item">
+                    <span class="txt">注册资金/万</span>
+                    <input type="number" v-model="form.registeredCapital">
+                </div>-->
+                <!--<div class="item">
+                    <span class="txt">去年年销售额</span>
+                    <input type="number" v-model="form.lastYearSales">
+                </div>-->
+                <!--<div class="item">
+                    <span class="txt">去年合作收入</span>
+                    <input type="number" v-model="form.cooperationSituation">
+                </div>-->
+                <!--<div class="item">
+                    <span class="txt">客户评级</span>
+                    <input type="text" v-model="form.customerRating">
+                </div>-->
+
             </div>
         </div>
 
@@ -135,10 +137,22 @@
                     <input type="text" v-model="form.name">
                 </div>
                 <div class="item">
+                    <span class="txt">简称</span>
+                    <input type="text" v-model="form.abbreviation">
+                </div>
+                <div class="item">
                     <span class="txt">编号</span>
                     <input type="text" v-model="form.code">
                 </div>
                 <div class="item">
+                    <span class="txt">其他情况说明</span>
+                    <input type="text" v-model="form.explain">
+                </div>
+                <div class="item">
+                    <span class="txt">跟进销售人员</span>
+                    <input type="text" v-model="form.belongUserName">
+                </div>
+                <!--<div class="item">
                     <span class="txt">省</span>
                     <input type="text" v-model="form.province">
                 </div>
@@ -155,17 +169,10 @@
                     <input type="text" v-model="form.stage">
                 </div>
                 <div class="item">
-                    <span class="txt">其他情况说明</span>
-                    <input type="text" v-model="form.explain">
-                </div>
-                <div class="item">
                     <span class="txt">中间公司</span>
                     <input type="text" v-model="form.intermediaryCompany">
-                </div>
-                <div class="item">
-                    <span class="txt">跟进销售人员</span>
-                    <input type="text" v-model="form.belongUserName">
-                </div>
+                </div>-->
+
             </div>
         </div>
 
@@ -199,28 +206,28 @@
             </div>
         </div>
 
-        <!-- 厂家-合作情况 -->
-        <!--<div class="baseinfo" v-show="form.type == 2">-->
-            <!--<div class="title">合作情况</div>-->
-            <!--<div class="list">-->
-                <!--<div v-for="(item, index) in form.cooperationSituation">-->
-                    <!--<div class="item">-->
-                        <!--<span class="txt">历史合作</span>-->
-                        <!--<input type="text" v-model="item.historical">-->
-                    <!--</div>-->
-                    <!--<div class="item">-->
-                        <!--<span class="txt">去年合作收入</span>-->
-                        <!--<input type="text" v-model="item.income">-->
-                    <!--</div>-->
+        <!--厂家-合作情况 -->
+        <!--<div class="baseinfo" v-show="form.type == 2">
+            <div class="title">合作情况</div>
+            <div class="list">
+                <div v-for="(item, index) in form.cooperationSituation">
+                    <div class="item">
+                        <span class="txt">历史合作</span>
+                        <input type="text" v-model="item.historical">
+                    </div>
+                    <div class="item">
+                        <span class="txt">去年合作收入</span>
+                        <input type="text" v-model="item.income">
+                    </div>
 
-                    <!--<div class="line"></div>-->
-                <!--</div>-->
+                    <div class="line"></div>
+                </div>
 
-                <!--<div class="btn-add-box">-->
-                    <!--<div class="btn-add" @click="addCooperationSituation">添加合作情况</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
+                <div class="btn-add-box">
+                    <div class="btn-add" @click="addCooperationSituation">添加合作情况</div>
+                </div>
+            </div>
+        </div>-->
 
         <div class="btn-save-box">
             <div class="btn-save" @click="submit">提交</div>

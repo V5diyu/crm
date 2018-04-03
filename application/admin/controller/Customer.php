@@ -639,7 +639,7 @@ class Customer extends Base
 
             $list_agent_data[] = $agent_item;
         }
-        dump(count($list_agent_data));
+        //dump(count($list_agent_data));
         /*if (!empty($list_agent_data)) {
             $this->mod->batchInsert($list_agent_data);
         }*/

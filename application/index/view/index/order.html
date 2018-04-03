@@ -21,6 +21,11 @@
             </div>
         </div>
 
+        <div class="order-box">
+            <span class="type" :class="{'type-active': order == 1}" @click="switchOrder(1)">订单签约日期排序</span>
+            <span class="type" :class="{'type-active': order == 2}" @click="switchOrder(2)">尾款到期日期排序</span>
+        </div>
+
         <div class="list">
             <a class="item" :href="'/index/index/orderDetail?id=' + item.id" v-for="(item, index) in listData">
                 <div class="title">
@@ -52,7 +57,6 @@
                         <span class="row-left">尾款到期日</span>
                         <span class="row-right">{{item.N_wkdqr}}</span>
                     </div>
-
                 </div>
             </a>
         </div>
@@ -76,8 +80,9 @@
             data: {
                 isNoData: false,
                 userInfo: {},
-                keyword: '',
-                pn: 1,
+                keyword : '',
+                pn      : 1,
+                order   : 1,
                 listData: [],
                 isHasNext: true,
                 isLoading: false
@@ -99,7 +104,8 @@
                             userName: self.userInfo.name,
                             D_khdw: self.keyword,
                             pn: self.pn,
-                            isCharge: self.userInfo.isCharge
+                            isCharge: self.userInfo.isCharge,
+                            order: self.order
                         }
                     }).then(function (resp) {
                         console.log(resp.data.data)
@@ -112,6 +118,10 @@
                             self.isNoData = true;
                         }
                     })
+                },
+                switchOrder: function (order) {
+                    var self = this;
+                    self.order = order;
                 }
             },
             created: function(){

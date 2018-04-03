@@ -43,19 +43,20 @@
                     <span class="company" style="color: #1295D9;">{{item.name}}</span>
                     <span class="type">{{item.type}}</span>
                 </div>
-                <div class="name" v-if="item.type == '厂家'">法人: {{item.legalRepresentative}}</div>
-                <div class="address">地址: {{item.address}}</div>
+                <!--<div class="name" v-if="item.type == '厂家'">法人: {{item.legalRepresentative}}</div>-->
+                <!--<div class="address">地址: {{item.address}}</div>-->
+                <!--<div class="address">ID: {{item.id}}</div>-->
             </a>
-            <!--<a :href="'/index/index/salesFunnel?id=' + item.id" class="note" v-if="item.type == '终端'">-->
-                <!--<div class="left">-->
-                    <!--<span class="tit">销售漏斗</span>-->
-                    <!--<span class="txt">阶段: {{item.salesFunnel.stage  || '无'}}</span>-->
-                <!--</div>-->
-                <!--<div class="right">-->
-                    <!--<span class="time">{{item.salesFunnel.time  || '无'}}</span>-->
-                    <!--<i class="iconfont icon-back_light"></i>-->
-                <!--</div>-->
-            <!--</a>-->
+            <!--<a :href="'/index/index/salesFunnel?id=' + item.id" class="note" v-if="item.type == '终端'">
+                <div class="left">
+                    <span class="tit">销售漏斗</span>
+                    <span class="txt">阶段: {{item.salesFunnel.stage  || '无'}}</span>
+                </div>
+                <div class="right">
+                    <span class="time">{{item.salesFunnel.time  || '无'}}</span>
+                    <i class="iconfont icon-back_light"></i>
+                </div>
+            </a>-->
 
             <div class="salesFunnel" v-if="item.type == '终端'">
                 <div class="left">销售漏斗</div>
@@ -109,8 +110,8 @@
                     <span class="company" style="color: #1295D9;">{{item.name}}</span>
                     <span class="type">{{item.type}}</span>
                 </div>
-                <div class="name" v-if="item.type == '厂家'">法人: {{item.legalRepresentative}}</div>
-                <div class="address">地址: {{item.address}}</div>
+                <!--<div class="name" v-if="item.type == '厂家'">法人: {{item.legalRepresentative}}</div>-->
+                <!--<div class="address">地址: {{item.address}}</div>-->
             </a>
 
             <div class="btn-group">
@@ -158,7 +159,7 @@
             <i class="iconfont icon-dailishangguanli"></i>
             <p>代理商</p>
         </a>-->
-        <a v-if="userInfo.roleName === '主管'" href="/index/index/managerRecord" class="nav-item">
+        <a v-if="userInfo.roleName === '主管'" href="/index/index/customerRecord" class="nav-item">
             <i class="iconfont icon-chanpin"></i>
             <p>沟通记录</p>
         </a>
@@ -319,7 +320,7 @@
                         pn: self.pn
                     }
                 }).then(function (resp) {
-                    console.log(resp.data.data)
+                    //console.log(resp.data.data)
                     ding.hideLoading();
                     resp.data.data.forEach(function(item){
                         item.key = '初步接触';

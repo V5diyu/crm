@@ -812,6 +812,7 @@
     font-size: .12rem;
     background-color: #e8e8e8;
 }
+
 .customerType-box .type:first-child{
     border-radius: 4px 0 0 4px;
 }
@@ -822,6 +823,33 @@
     color: #fff;
     background-color: #1295D9;
 }
+
+.order-box {
+    display: flex;
+}
+
+.order-box .type {
+    display: inline-block;
+    width: 2.6rem;
+    height: .3rem;
+    line-height: .3rem;
+    text-align: center;
+    color: #666;
+    font-size: .12rem;
+    background-color: #e8e8e8;
+}
+.order-box .type:first-child{
+    border-radius: 4px 0 0 4px;
+}
+
+.order-box .type:last-child{
+    border-radius: 0 4px 4px 0;
+}
+.order-box .type-active{
+    color: #fff;
+    background-color: #1295D9;
+}
+
 .addCustomer .baseinfo .title{
     height: .4rem;
     line-height: .4rem;
