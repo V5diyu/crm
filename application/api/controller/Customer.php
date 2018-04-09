@@ -308,9 +308,22 @@ class Customer extends Base
     public function getRecordList()
     {
         $pn          = input('pn/d', 1);
+        //
+        $isCharge    = input('isCharge');
+        $userName    = input('userName');
+        //
+
         $ps          = 15;
         $start       = ($pn - 1) * $ps;
         $where       = [];
+
+        //
+        if ($isCharge == 2) {
+            $where = [];
+        } else {
+            $where = ['userName' => $userName];
+        }
+        //
         $data_record = $this->mod_record->get($where, $start, $ps);
 
         $customerIds = array_column(iterator_to_array($data_record), 'customerId');
@@ -476,15 +489,65 @@ class Customer extends Base
 
     public function indexRecordAdd ()
     {
-        $userId     = input('userId');      //
-        $userName   = input('username');    //
-        $recordList = input('recordList');  //多条记录情况
+        $userId     = input('userId');              //
+        $userName   = input('username');            //
+        $customer   = input('customer');            //
+        $customerName = input('customerName');      //
+        $remark     = input('remark');              //
+
+        $recordList = input('recordList/a',[]);     //多条记录情况
         $record_list = [];
+
+        if (empty($userId) || empty($userName)) {
+            return json(error('缺少必要参数'));
+        }
 
         if (empty($recordList)) {
             return json(error('未接收到内容'));
         }
+
+        if ( count($recordList) == 1  && (empty($recordList[0]['customer']) || empty($recordList[0]['customerName']) || empty($recordList[0]['remark']))) {
+            return json(error('内容填写不完整'));
+        }
+        //return json(ok());
+
         foreach ($recordList as $recordItem) {
+
+            if (empty($recordItem['customer']) || empty($recordItem['customerName']) || empty($recordItem['remark'])) {
+                continue;
+            }
+            $where['$or'] = [
+                ['abbreviation' => ['$regex' => $recordItem['customer'], '$options' => 'i']],
+                ['name' => ['$regex' => $recordItem['customer'], '$options' => 'i']]
+            ];
+            $customer_data = $this->mod->getInfo($where);
+
+            if (!empty($customer_data)) {
+                $record_list[] = [
+                    'id'        => $customer_data['id'],
+                    'userId'    => $userId,
+                    'userName'  => $userName,
+                    'customerId'    => $customer_data['id'],
+                    'customerName'  => $recordItem['customerName'],
+                    'title'     => '',
+                    'time'      => date('Y-m-d H:i:s'),
+                    'remark'    => $recordItem['remark'],
+                    'status'    => 1,
+                    'create'    => time(),
+                    'type'      => 1
+                ];
+            }
+        }
+
+        /*if (empty($recordList)) {
+            return json(error('未接收到内容'));
+        } else {
+            return json(ok('成功'));
+        }*/
+        /*if (count($recordList) == 1 && ( empty($recordList[0]['customerName'])) || empty($recordList[0]['customer'])|| empty($recordList[0]['remark'])) {
+            return json(error('缺少必要参数'));
+        }*/
+        /*foreach ($recordList as $recordItem) {
 
             if (empty($recordItem['customer']) || empty($recordItem['customerName']) || empty($recordItem['remark'])) {
                 continue;
@@ -510,25 +573,26 @@ class Customer extends Base
                     'type'          => 1
                 ];
             }
-
-        }
+        }*/
 
         if (!empty($record_list)) {
-            //$this->mod_record->batchInsert($record_list);
+            $this->mod_record->batchInsert($record_list);
+            return json(ok('新建沟通记录'));
         }
-
-        //return json(ok($record_list));
-        return json(ok($recordList));
+        return json(ok());
 
     }
 
     public function testId ()
     {
         /*$data = $this->mod->getInfo(['name'=> '湖南创世智能科技有限公司']);*/
-        $data = 15120549010377588;
-        $data = dechex($data);
 
-        return json(ok($data));
+        [
+          'ret'=>true,
+           'data' => [],
+            ''
+        ];
+
     }
 
 }

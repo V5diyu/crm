@@ -55,7 +55,7 @@ $sql_3 = "select tm.CAS_NO  as contract, (select sum(ts.amtn_bb) from  TF_MON ts
 
 //$sql_4 = "select p.cus_os_no as contract, ml.AMT as paid, tl.AMT as payment  from MF_POS p left join MF_LZ ml on ml.CAS_NO = p.cus_os_no left join TF_LZ tl on tl.cus_os_no = p.cus_os_no where p.OS_DD >='2017-12-01 00:00:00' AND p.OS_DD<'2018-01-01 00:00:00' and p.cus_os_no is not null order by p.cus_os_no, ml.AMT desc";
 //$sql_pay_detail = "select tm.CAS_NO  as contract, tm.amtn_bb as payment, tm.RP_DD as paydate, tm.rp_no as payno  from  TF_MON tm  where ((tm.rp_DD >='" . $str_pre ."' AND tm.rp_DD<'". $str_current ."') or (tm.Modify_dd >='". $str_pre ."' AND tm.Modify_dd<'" . $str_current . "') or (tm.sys_date >='". $str_pre ."' AND tm.sys_date<'" . $str_current . "')) and tm.CAS_NO is not null and tm.CAS_NO <>'' and tm.RP_ID =1";
-$sql_pay_detail = "select min(tm.CAS_NO)  as contract, min(tm.amtn_bb) as payment, min(tm.RP_DD) as paydate, min(tm.rp_no) as payno, min(s.Name) as salesman from  TF_MON tm left join MF_POS p on p.cus_os_no = tm.CAS_NO left join SALM s on s.sal_no = p.sal_no where ((tm.rp_DD >='". $str_pre ."' AND tm.rp_DD<'" . $str_current . "') or (tm.Modify_dd >='". $str_pre ."' AND tm.Modify_dd<'" . $str_current . "') or (tm.sys_date >='". $str_pre ."' AND tm.sys_date<'" . $str_current . "')) and tm.CAS_NO is not null and tm.CAS_NO <>'' and tm.RP_ID =1";
+$sql_pay_detail = "select min(tm.CAS_NO)  as contract, min(tm.amtn_bb) as payment, min(tm.RP_DD) as paydate, min(tm.rp_no) as payno, min(s.Name) as salesman from  TF_MON tm left join MF_POS p on p.cus_os_no = tm.CAS_NO left join SALM s on s.sal_no = p.sal_no where ((tm.rp_DD >='". $str_pre ."' AND tm.rp_DD<'" . $str_current . "') or (tm.Modify_dd >='". $str_pre ."' AND tm.Modify_dd<'" . $str_current . "') or (tm.sys_date >='". $str_pre ."' AND tm.sys_date<'" . $str_current . "')) and tm.CAS_NO is not null and tm.CAS_NO <>'' and tm.RP_ID =1 group by tm.CAS_NO, tm.rp_no";
 
 $stmt = sqlsrv_query($conn,$sql_1);
 while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)){
@@ -101,6 +101,12 @@ while ($row = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)) {
     $pay_detail[$id_pay]['name']    = $row['salesman'];
 
     $pay_date_arr = (array)$row['paydate'];
+
+    /*if (empty($pay_date_arr['date'])) {
+    	var_dump($$row['paydate']);
+    	break;	
+    }*/
+
     $pay_time_y = date('Y',strtotime($pay_date_arr['date']));
     $pay_time_m = date('Y-m',strtotime($pay_date_arr['date']));
     $pay_detail[$id_pay]['time_y'] = $pay_time_y;
@@ -321,7 +327,7 @@ if (!empty($pay_detail_arr)) {
 
 //写入自动更新日志
 if (!empty($data_log)) {
-    $mod_autoSynLog->batchInsert($data_log);
+    //$mod_autoSynLog->batchInsert($data_log);
     echo "autoSynLog";
 }
 
@@ -355,7 +361,7 @@ if (!empty($sale_receive_arr)) {
         $sale_man = $arr_explode[1];
         $time_m   = $arr_explode[0];
         $time_y   = date('Y',strtotime($time_m));
-        $mod_personReceive->delete(['name'=>$sale_man,'time_m'=>$time_m]);
+        $mod_personReceive->delete(['name'=>$sale_man,'time'=>$time_m]);
         $info = iterator_to_array($mod_payDetail->get(['time_m'=>$time_m,'name'=> $sale_man]));
 
         $list_personReceive[$receive_key]['time']       = $time_m;
@@ -491,7 +497,7 @@ function strEmptyFloat($str)
 
 
 //测试脚本是否执行
-sqlsrv_close();
+sqlsrv_close($conn);
 $str = file_get_contents("C:\\xampp\\htdocs\\public\\test.txt");
 $str .= "\tTK" . $str_current  . "\n" ;
 file_put_contents("C:\\xampp\\htdocs\\public\\test.txt",$str);

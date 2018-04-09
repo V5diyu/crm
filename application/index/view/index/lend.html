@@ -35,12 +35,12 @@
                         <span class="row-right">{{item.C_ssxm}}</span>
                     </div>-->
                     <div class="row">
-                        <span class="row-left">总价</span>
-                        <span class="row-right">{{item.D_zj}}</span>
+                        <span class="row-left">销售人员</span>
+                        <span class="row-right">{{item.E_xsry}}</span>
                     </div>
                     <div class="row">
                         <span class="row-left">借用数量</span>
-                        <span class="row-right">{{item.F_fh}}</span>
+                        <span class="row-right">{{item.G_jysl}}</span>
                     </div>
                     <!--<div class="row">
                         <span class="row-left">付款比例</span>
@@ -73,7 +73,7 @@
         </a>
         <a class="nav-item" href="/index/index/lend">
             <i class="iconfont icon-jihua"></i>
-            <p>借用</p>
+            <p>借用查询</p>
         </a>
         <a class="nav-item" href="/index/index/customer">
             <i class="iconfont icon-category"></i>
@@ -89,12 +89,12 @@
             <p>沟通记录</p>
         </a>
     </div>
+
 </body>
 
 <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
 <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
-
 <script src="/static/js/dingding.js"></script>
 <script src="/static/js/util.js"></script>
 <!--<script src="/mobile/lib/ydui/ydui.js"></script>  -->              <!--组件类库-->
@@ -154,6 +154,7 @@
             ding.ready(function () {
                 ding.getUserInfo(function (resp) {
                     self.userInfo = resp.data;
+                    //alert(self.userInfo.roleName);
                     self.getData();
                 });
             });

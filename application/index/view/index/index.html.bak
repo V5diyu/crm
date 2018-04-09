@@ -193,7 +193,7 @@
             <div class="top">
                 <div class="left">添加沟通记录</div>
             </div>
-            <!--<div class="list" v-for="(item, index) in form.recordList">
+            <div class="list" v-for="(item, index) in recordList">
                 <div class="item" >
                     <span class="txt">客户名称</span>
                     <input type="text" v-model="item.customer">
@@ -204,23 +204,10 @@
                 </div>
                 <div class="item-bt">
                     <span class="txt">沟通内容</span>
-                    <textarea  v-model="item.remark"></textarea>
-                </div>
-            </div>-->
-            <div class="list">
-                <div class="item" >
-                    <span class="txt">客户名称</span>
-                    <input type="text" v-model="simple.customer">
-                </div>
-                <div class="item">
-                    <span class="txt">沟通对象</span>
-                    <input type="text" v-model="simple.customerName">
-                </div>
-                <div class="item-bt">
-                    <span class="txt">沟通内容</span>
-                    <textarea  v-model="simple.remark"></textarea>
+                    <input type="text" v-model="item.remark">
                 </div>
             </div>
+
             <div class="btn">
                 <button class="bt-left" @click="addRecord">添加新纪录</button>
                 <button class="bt-right" @click="submit">提交记录</button>
@@ -238,7 +225,7 @@
             </a>
             <a class="nav-item" href="/index/index/lend">
                 <i class="iconfont icon-jihua"></i>
-                <p>借用查询</p>
+                <p>借用</p>
             </a>
             <a class="nav-item" href="/index/index/customer">
                 <i class="iconfont icon-category"></i>
@@ -298,14 +285,6 @@
                 customer: '',
                 customerName: '',
                 remark: '',
-                simple: {
-                    userId: '',
-                    username: '',
-                    isCharge: '',
-                    customer: '',
-                    customerName: '',
-                    remark: '',
-                },
                 recordList : [{}],
                 form : {
                     userId: '',
@@ -398,15 +377,18 @@
                 // 表单提交
                 submit: function () {
                     var self = this;
-                    //alert(formData['recordList'][0]['customer']);
-                    alert(self.recordList[0]['customer']);
-                    ajax.post('/api/customer/indexRecordAdd',self.simple, function (resp) {
-                        if (resp.ret) {
+                    var formData = {
+                        'userId': self.userInfo.userid,
+                        'username': self.userInfo.userName,
+                        'isCharge': self.userInfo.isCharge,
+                        'recordList' : self.recordList
+                    };
 
+                    ajax.post('/api/customer/indexRecordAdd',formData, function (resp) {
+                        alert(resp.ret);
+                        if (resp.ret) {
                             ding.toast('添加成功');
-                            self.simple.customer        = '';
-                            self.simple.customerName    = '';
-                            self.simple.remark          = '';
+                            self.recordList = [{}];
                         } else {
                             ding.toast(resp.msg);
                         }
@@ -425,9 +407,6 @@
                 ding.ready(function () {
                     ding.getUserInfo(function (resp) {
                         self.userInfo = resp.data;
-                        self.simple.userId = self.userInfo.userid;
-                        self.simple.username = self.userInfo.name;
-                        self.simple.isCharge = self.userInfo.isCharge;
                         self.getData();
                     });
                 });

@@ -15,7 +15,7 @@
 <body>
     <div class="container addCustomer" id="app">
 
-        <div class="customerType">
+        <!--<div class="customerType">
             <span class="txt">客户类型</span>
             <div class="customerType-box">
                 <span class="type" :class="{'type-active': form.type == 1}" @click="switchType(1)">终端</span>
@@ -23,7 +23,7 @@
                 <span class="type" :class="{'type-active': form.type == 3}" @click="switchType(3)">代理商</span>
                 <span class="type" :class="{'type-active': form.type == 4}" @click="switchType(4)">代理人</span>
             </div>
-        </div>
+        </div>-->
 
         <!--代理人-客户信息-->
         <div class="baseinfo" v-show="form.type == 4">

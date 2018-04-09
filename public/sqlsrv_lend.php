@@ -46,13 +46,23 @@ $lend_list      = [];
 
 //借用(缺少单价或者借用总价)
 //借用(缺少单价或者借用总价)
-$sql_lend  = "select m.bl_no as A_dh, t.prd_no as B_ph, t.prd_name as C_pm, t.amt as price, m.BL_DD as lenddate,m.EST_DD as returndate,t.qty as G_jysl,t.qty_rtn as H_ghsl,(select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman   from TF_BLN t,MF_BLN m where t.BL_NO = m.BL_NO and  ((m.BL_DD >='2015-01-01 00:00:00' AND m.bl_DD<'2019-01-01 00:00:00') or (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') or (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) and m.bl_id = 'LN'";
+//$sql_lend  = "select m.bl_no as A_dh, t.prd_no as B_ph, t.prd_name as C_pm, t.amt as price, m.BL_DD as lenddate,m.EST_DD as returndate,t.qty as G_jysl,t.qty_rtn as H_ghsl,(select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman   from TF_BLN t,MF_BLN m where t.BL_NO = m.BL_NO and  ((m.BL_DD >='2015-01-01 00:00:00' AND m.bl_DD<'2019-01-01 00:00:00') or (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') or (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) and m.bl_id = 'LN'";
 
 //发票
-$sql_bill = "select lz_no, lz_dd, amt,cas_no  from mf_lz m where ((m.lz_dd >='2015-01-01 00:00:00' AND m.lz_dd<'2019-01-01 00:00:00') OR (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') OR (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) AND m.lz_id = 'LO' ";
+//$sql_bill = "select lz_no, lz_dd, amt,cas_no  from mf_lz m where ((m.lz_dd >='2015-01-01 00:00:00' AND m.lz_dd<'2019-01-01 00:00:00') OR (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') OR (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) AND m.lz_id = 'LO' ";
 
 //交期
-$sql_product = "select t.ck_no as D_dh, t.prd_no as E_ph, t.prd_name as F_pm,t.ck_dd, t.prd_mark as G_hpgg,t.unit as H_dw,t.REM as O_bz,t.qty as J_sl,t.est_dd,t.qty_ps as L_wzxhsl, m.cus_os_no as C_gcah, (select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman from tf_ck t,mf_ck m where t.ck_no = m.ck_no and ((m.ck_dd >='2015-01-01 00:00:00' AND m.ck_dd<'2019-01-01 00:00:00') or (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') or (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) and t.ck_id = 'CK'";
+//$sql_product = "select t.ck_no as D_dh, t.prd_no as E_ph, t.prd_name as F_pm,t.ck_dd, t.prd_mark as G_hpgg,t.unit as H_dw,t.REM as O_bz,t.qty as J_sl,t.est_dd,t.qty_ps as L_wzxhsl, m.cus_os_no as C_gcah, (select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman from tf_ck t,mf_ck m where t.ck_no = m.ck_no and ((m.ck_dd >='2015-01-01 00:00:00' AND m.ck_dd<'2019-01-01 00:00:00') or (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') or (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) and t.ck_id = 'CK'";
+
+$sql_lend  = "select m.bl_no as A_dh, t.prd_no as B_ph, t.prd_name as C_pm, t.amt as price, m.BL_DD as lenddate,m.EST_DD as returndate,t.qty as G_jysl,t.qty_rtn as H_ghsl,(select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman   from TF_BLN t,MF_BLN m where t.BL_NO = m.BL_NO and  ((m.BL_DD >='". $str_pre ."' AND m.bl_DD<'". $str_current ."') or (m.Modify_dd >='". $str_pre ."' AND m.Modify_dd<'" . $str_current . "') or (m.sys_date >='". $str_pre ."' AND m.sys_date<'". $str_current ."')) and m.bl_id = 'LN'";
+
+//发票
+$sql_bill = "select lz_no, lz_dd, amt,cas_no  from mf_lz m where ((m.lz_dd >='". $str_pre ."' AND m.lz_dd<'". $str_current ."') OR (m.Modify_dd >='". $str_pre ."' AND m.Modify_dd<'". $str_current ."') OR (m.sys_date >='". $str_pre ."' AND m.sys_date<'". $str_current ."')) AND m.lz_id = 'LO' ";
+
+//交期
+$sql_product = "select t.ck_no as D_dh, t.prd_no as E_ph, t.prd_name as F_pm,t.ck_dd, t.prd_mark as G_hpgg,t.unit as H_dw,t.REM as O_bz,t.qty as J_sl,t.est_dd,t.qty_ps as L_wzxhsl, m.cus_os_no as C_gcah, (select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman from tf_ck t,mf_ck m where t.ck_no = m.ck_no and ((m.ck_dd >='". $str_pre ."' AND m.ck_dd<'". $str_current ."') or (m.Modify_dd >='". $str_pre ."' AND m.Modify_dd<'". $str_current ."') or (m.sys_date >='". $str_pre ."' AND m.sys_date<'". $str_current ."')) and t.ck_id = 'CK'";
+
+
 
 $stmt = sqlsrv_query($conn,$sql_lend);
 while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
@@ -71,8 +81,8 @@ while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
     $lend_arr[$id]['G_jysl'] = $row['G_jysl'];
     $lend_arr[$id]['H_ghsl'] = $row['H_ghsl'];
     $lend_arr[$id]['I_jcsj'] = strtotime($arr_1['date']);
-    $lend_arr[$id]['J_ghsj'] = strtotime($arr_2['date']);
-    $lend_arr[$id]['K_dqsj'] = strtotime(date('Y-m-d',$arr_1['date']) . ' +3 months');
+    $lend_arr[$id]['J_ghsj'] = empty($arr_2) ? '' : strtotime($arr_2['date']);
+    $lend_arr[$id]['K_dqsj'] = strtotime(date('Y-m-d',strtotime($arr_1['date'])) . ' +3 months');
 
     unset($arr_2) ;
     unset($arr_1) ;
@@ -117,7 +127,7 @@ while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
 
 //借用            联合主键
 if (!empty($lend_arr)) {
-
+	//echo '<br >',count($lend_arr),'<br >';
     foreach ($lend_arr as $lend_item) {
         $data_find = $mod_lend->getInfo([ 'A_dh'=> $lend_item['A_dh'], 'B_ph' => $lend_item['B_ph'] ]);
         if (empty($data_find)) {
@@ -173,12 +183,12 @@ if (!empty($bill_arr)) {
             $info = $mod_bill->getInfo([ 'A_pjhm' => $bill_item['A_pjhm'] ]);
 
             //发票明细更新
-            /*$mod_bill->uopdate([
+            $mod_bill->update([
                 'A_pjhm' => $bill_item['A_pjhm'],
                 'B_pmje' => $bill_item['B_pmje'],
                 'C_kpsj' => $bill_item['C_kpsj'],
                 'D_hth'  => $bill_item['D_hth']
-            ],$info['id']);*/
+            ],$info['id']);
 
             //=============同步信息
 
@@ -188,7 +198,7 @@ if (!empty($bill_arr)) {
 
 //交期        联合主键
 if (!empty($product_arr)) {
-
+	echo '<br >product:',count($product_arr),'<br >';
     foreach ($product_arr as $product_item) {
 
         $data_find = $mod_product->getInfo([ 'D_dh' => $product_item['D_dh'], 'E_ph' => $product_item['E_ph'] ]);
@@ -216,7 +226,7 @@ if (!empty($product_arr)) {
             $N_yjfhsj   = $product_item['N_yjfhsj'];
             $O_bz       = $product_item['O_bz'];
 
-            //更新日志信息
+            //更新交期信息
             /*$mod_product->update([
                 'A_khmc'    => $A_khmc,
                 'B_ywy'     => $B_ywy,
@@ -232,32 +242,36 @@ if (!empty($product_arr)) {
             //=============同步信息
         }
 
+        //修改订单的交期时间
+        $contract   = $product_item['C_gcah'];
+        $time_jqrq  = $product_item['I_ckrq'];
+        $mod_order->update([
+            'T_jqrq' => $time_jqrq
+        ],['A_hth'=>$contract]);
+
     }
 }
 
 //写入借用信息
 if (!empty($lend_list)) {
 
-    //
-
-    //$mod_lend->batchInsert($lend_list);
+	//echo '<br >',count($lend_list),'<br >';
+    $mod_lend->batchInsert($lend_list);
 }
 
 
 //写入发票信息
 if (!empty($bill_list)) {
 
-    //
-
-    //$mod_bill->batchInsert($bill_list);
+	//echo count($bill_list),'<br >';
+    $mod_bill->batchInsert($bill_list);
 }
 
 
 //写入交期信息
 if (!empty($product_list)) {
 
-    //
-
+	//echo 'product:',count($product_list),'<br >';
     //$mod_product->batchInsert($product_list);
 }
 

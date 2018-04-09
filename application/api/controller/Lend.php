@@ -30,7 +30,7 @@ class Lend extends Base
         $pn       = input('pn/d', 1);
         $ps       = 15;
         $start    = ($pn - 1) * $ps;
-
+        $sort     = ['L_ghbl'=> 1,'K_dqsj'=> 1];
         if (empty($userName)) {
             return json(error('缺少必要的参数'));
         }
@@ -45,7 +45,7 @@ class Lend extends Base
             $where['F_khmc'] = ['$regex' => $F_khmc, '$options' => 'i'];
         }
 
-        $data = $this->mod_data->get($where,$start,$ps);
+        $data = $this->mod_data->get($where,$start,$ps,$sort);
         $list = [];
         if (!empty($data)) {
             foreach ($data as $item) {
@@ -57,8 +57,8 @@ class Lend extends Base
                     'D_zj'      => $item['D_zj'],
                     'E_xsry'    => $item['E_xsry'],
                     'F_khmc'    => $item['F_khmc'],
-                    'G_jysl'    => $item['G_jysl'],
-                    'H_ghsl'    => $item['H_ghsl'],
+                    'G_jysl'    => empty($item['G_jysl']) ? 0 : $item['G_jysl'],
+                    'H_ghsl'    => empty($item['H_ghsl']) ? 0 : $item['H_ghsl'],
                     'I_jcsj'    => date('Y-m-d',$item['I_jcsj']),
                     'J_ghsj'    => date('Y-m-d',$item['J_ghsj']),
                     'K_dqsj'    => date('Y-m-d',$item['K_dqsj']),
@@ -66,7 +66,6 @@ class Lend extends Base
             }
         }
         return json(ok($list));
-
     }
 
     public function getInfo ()

@@ -45,19 +45,20 @@ class OrderInfo extends Base
         }
         if ($isCharge == 2) {
             $where = [];
-        }
-        else {
+        } else {
             $where = ['F_xsry' => $userName];
         }
         if ($order == 1) {
-            $sort = '';
+            $sort = ['B_htqyrq' => -1];
+        } else if ($order == 2) {
+            $sort = ['H_fhbl' => 1,'N_wkdqr' => -1];
         } else {
-            $sort = '';
+            $sort = ['H_fhbl' => 1, 'B_htqyrq'=> -1];
         }
         if (!empty($D_khdw)) {
             $where['D_khdw'] = ['$regex' => $D_khdw, '$options' => 'i'];
         }
-        $data = $this->mod_data->get($where, $start, $ps);
+        $data = $this->mod_data->get($where, $start, $ps, $sort);
         $list = [];
         foreach ($data as $item) {
             $list[] = [
@@ -66,6 +67,7 @@ class OrderInfo extends Base
                 'C_ssxm' => $item['C_ssxm'],
                 'D_khdw' => $item['D_khdw'],
                 'E_zj'   => $item['E_zj'],
+                'F_xsry' => $item['F_xsry'],
                 'H_fhbl' => $item['H_fhbl'] . '%',
                 'J_fkje' => empty($item['J_fkje']) ? 0 : $item['J_fkje'],
                 'K_fkbl' => round($item['K_fkbl'], 3) . '%',

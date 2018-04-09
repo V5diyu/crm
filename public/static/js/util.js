@@ -54,9 +54,11 @@ var  util = {
 
 var ajax = {
     post: function(url, data, cb){
+        //Qs.stringify
         axios.post(url, Qs.stringify(data),{
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         }).then(function(res) {
+            //alert(JSON.stringify(res));
             if (res.data.ret == true) {
                 cb && cb(res.data);
             } else {

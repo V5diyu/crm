@@ -9,13 +9,14 @@
 
 include_once('C:\xampp\htdocs\application\dbhelp\LendDB.php');                  //借用表
 include_once('C:\xampp\htdocs\application\dbhelp\BillDB.php');
-include_once('C:\xampp\htdocs\application\dbhelp\ProductDeliveryDataDB.php');
+include_once('C:\xampp\htdocs\application\dbhelp\ProductDeliveryDataDB.php');   //交期表
+include_once('C:\xampp\htdocs\application\dbhelp\OrderInfoDataDB.php');         //根据交期表更新订单的交期时间
 include_once('C:\xampp\htdocs\application\dbhelp\AutosynLogDb.php');            //同步表
 
 date_default_timezone_set("PRC");
 
 $servern="localhost";
-$coninfo=array("Database"=>"DB_ZJTK","UID"=>"sa","PWD"=>"SAsa123","CharacterSet"=>"utf-8");
+$coninfo=array("Database"=>"DB_TK01","UID"=>"sa","PWD"=>"SAsa123","CharacterSet"=>"utf-8");
 
 $conn=sqlsrv_connect($servern,$coninfo) or die ("connect deny!");
 if($conn){
@@ -26,6 +27,7 @@ if($conn){
 }
 
 $mod_lend           = new LendDB();
+$mod_order          = new OrderInfoDataDB();
 $mod_autoSynLog     = new AutosynLogDb();
 $mod_bill           = new BillDB();
 $mod_product        = new ProductDeliveryDataDB();
@@ -71,8 +73,8 @@ while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
     $lend_arr[$id]['G_jysl'] = $row['G_jysl'];
     $lend_arr[$id]['H_ghsl'] = $row['H_ghsl'];
     $lend_arr[$id]['I_jcsj'] = strtotime($arr_1['date']);
-    $lend_arr[$id]['J_ghsj'] = strtotime($arr_2['date']);
-    $lend_arr[$id]['K_dqsj'] = strtotime(date('Y-m-d',$arr_1['date']) . ' +3 months');
+    $lend_arr[$id]['J_ghsj'] = empty($arr_2) ? '' : strtotime($arr_2['date']);
+    $lend_arr[$id]['K_dqsj'] = strtotime(date('Y-m-d',strtotime($arr_1['date'])) . ' +3 months');
 
     unset($arr_2) ;
     unset($arr_1) ;
@@ -109,9 +111,9 @@ while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
     $product_arr[$id]['H_dw']       = $row['H_dw']; //
     $product_arr[$id]['I_ckrq']     = strtotime($arr_1['date']); //
     $product_arr[$id]['J_sl']       = $row['J_sl'];
-    $product_arr[$id]['K_xhsl']     = $row['K_xhsl'];
+    $product_arr[$id]['K_xhsl']     = $row['J_sl'] - $row['L_wzxhsl'];
     $product_arr[$id]['L_wzxhsl']   = $row['L_wzxhsl'];
-    $product_arr[$id]['N_yjfhsj']   = $strtotime($arr_2['date']);
+    $product_arr[$id]['N_yjfhsj']   = empty($arr_2) ? '' : strtotime($arr_2['date']);
     $product_arr[$id]['O_bz']       = $row['O_bz']; //
 }
 
@@ -128,7 +130,7 @@ if (!empty($lend_arr)) {
         } else {
             $id = $data_find['id'];
 
-            $D_zj   = $leng_item['D_zj'];
+            $D_zj   = $lend_item['D_zj'];
             $E_xsry = $lend_item['E_xsry'];
             $F_khmc = $lend_item['F_khmc'];
             $G_jysl = $lend_item['G_jysl'];
@@ -138,7 +140,7 @@ if (!empty($lend_arr)) {
             $K_dqsj = $lend_item['K_dqsj'];
 
             //更新数据
-            $mod_lend = update([
+            $mod_lend->update([
                 'D_zj'      => $D_zj,
                 'E_xsry'    => $E_xsry,
                 'F_khmc'    => $F_khmc,
@@ -173,12 +175,12 @@ if (!empty($bill_arr)) {
             $info = $mod_bill->getInfo([ 'A_pjhm' => $bill_item['A_pjhm'] ]);
 
             //发票明细更新
-            /*$mod_bill->uopdate([
+            $mod_bill->uopdate([
                 'A_pjhm' => $bill_item['A_pjhm'],
                 'B_pmje' => $bill_item['B_pmje'],
                 'C_kpsj' => $bill_item['C_kpsj'],
                 'D_hth'  => $bill_item['D_hth']
-            ],$info['id']);*/
+            ],$info['id']);
 
             //=============同步信息
 
@@ -196,7 +198,11 @@ if (!empty($product_arr)) {
         if (empty($data_find)) {
             $product_list[] = $product_item;
 
+
             //=============同步信息
+
+
+
         } else {
 
             $id = $data_find['id'];
@@ -214,7 +220,7 @@ if (!empty($product_arr)) {
             $K_xhsl     = $product_item['K_xhsl'];
             $L_wzxhsl   = $product_item['L_wzxhsl'];
             $N_yjfhsj   = $product_item['N_yjfhsj'];
-            $O_bz       = $porduct_item['O_bz'];
+            $O_bz       = $product_item['O_bz'];
 
             //更新交期信息
             /*$mod_product->update([
@@ -232,32 +238,36 @@ if (!empty($product_arr)) {
             //=============同步信息
         }
 
+        //修改订单的交期时间
+        $contract   = $product_item['C_gcah'];
+        $time_jqrq  = $product_item['I_ckrq'];
+        $mod_order->update([
+            'T_jqrq' => $time_jqrq
+        ],['A_hth'=>$contract]);
+
     }
 }
 
 //写入借用信息
 if (!empty($lend_list)) {
 
-    //
-
-    //$mod_lend->batchInsert($lend_list);
+    //echo '<br >',count($lend_list),'<br >';
+    $mod_lend->batchInsert($lend_list);
 }
 
 
 //写入发票信息
 if (!empty($bill_list)) {
 
-    //
-
-    //$mod_bill->batchInsert($bill_list);
+    //echo count($bill_list),'<br >';
+    $mod_bill->batchInsert($bill_list);
 }
 
 
 //写入交期信息
 if (!empty($product_list)) {
 
-    //
-
+    //echo 'product:',count($product_list),'<br >';
     //$mod_product->batchInsert($product_list);
 }
 

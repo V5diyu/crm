@@ -67,7 +67,7 @@
             </a>
             <a class="nav-item" href="/index/index/lend">
                 <i class="iconfont icon-jihua"></i>
-                <p>借用</p>
+                <p>借用查询</p>
             </a>
             <a class="nav-item" href="/index/index/customer">
                 <i class="iconfont icon-category"></i>
@@ -110,7 +110,9 @@
 
                     axios.get('/api/customer/getRecordList', {
                         params: {
-                            pn: self.pn
+                            pn      :   self.pn,
+                            isCharge:   self.userInfo.isCharge,
+                            userName:   self.userInfo.name
                         }
                     }).then(function (resp) {
                         //ding.hideLoading();
@@ -131,6 +133,7 @@
                 ding.ready(function(){
                     ding.getUserInfo(function(resp){
                         self.userInfo = resp.data;
+                        //alert(self.userInfo.roleName);
                         self.getData();
                     });
                 });

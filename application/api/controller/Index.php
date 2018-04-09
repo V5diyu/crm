@@ -51,7 +51,7 @@ class Index extends Base
 
             $ranking               = 0;
             $myContractVolume      = 0;
-            $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';                                             //公司当月的订单->签约额
+            $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : 0;                                             //公司当月的订单->签约额
 
             //===公司当年签约额
             $myContractVolumeYear = array_sum(array_column(iterator_to_array($userStatistics_y), 'myContractVolume'));
@@ -115,9 +115,9 @@ class Index extends Base
                     ]) + 1;
 
                 //销售月签约额
-                $myContractVolume      = $userStatistics['myContractVolume'];
+                $myContractVolume      = empty($userStatistics['myContractVolume']) ? 0 : $userStatistics['myContractVolume'];
                 //公司当月的签约额
-                $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';
+                $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : 0;
 
                 //===销售当年签约额
                 $myContractVolumeYear  =  array_sum(array_column(iterator_to_array($userStatistics_y),'myContractVolume'));
@@ -254,7 +254,7 @@ class Index extends Base
             $ranking               = 0;
             $myContractVolume      = 0;
             //公司当月签约额
-            $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';
+            $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : 0;
 
             //===公司当年签约额
             $myContractVolumeYear = array_sum(array_column(iterator_to_array($userStatistics_y), 'myContractVolume'));
@@ -314,9 +314,9 @@ class Index extends Base
                         'time'             => $time
                     ]) + 1;
                 //销售当月签约额
-                $myContractVolume      = $userStatistics['myContractVolume'];
+                $myContractVolume      = empty($userStatistics['myContractVolume']) ? 0 : $userStatistics['myContractVolume'];
                 //公司当月签约额
-                $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : '';
+                $companyContractVolume = isset($companyStatistics['companyContractVolume']) ? $companyStatistics['companyContractVolume'] : 0;
 
                 //===销售当年签约额
                 $myContractVolumeYear  =  array_sum(array_column(iterator_to_array($userStatistics_y),'myContractVolume'));

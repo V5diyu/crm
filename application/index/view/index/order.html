@@ -24,6 +24,7 @@
         <div class="order-box">
             <span class="type" :class="{'type-active': order == 1}" @click="switchOrder(1)">订单签约日期排序</span>
             <span class="type" :class="{'type-active': order == 2}" @click="switchOrder(2)">尾款到期日期排序</span>
+            <span class="type" :class="{'type-active': order == 3}" @click="switchOrder(3)">订单交期日期排序</span>
         </div>
 
         <div class="list">
@@ -122,6 +123,8 @@
                 switchOrder: function (order) {
                     var self = this;
                     self.order = order;
+                    self.listData = [];
+                    self.getData();
                 }
             },
             created: function(){
