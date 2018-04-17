@@ -91,12 +91,13 @@ class Customer extends Base
 
     public function get()
     {
-        $userId = input('userId');
-        $belong = input('belong/d', 1);    // 1:我的客户 2：客户池
-        $name   = input('name');
-        $pn     = input('pn', 1);
-        $ps     = 15;
-        $start  = ($pn - 1) * $ps;
+        $userId   = input('userId');
+        $belong   = input('belong/d', 1);    // 1:我的客户 2：客户池
+        $name     = input('name');
+        $pn       = input('pn', 1);
+        $isCharge = input('isCharge',1);
+        $ps       = 15;
+        $start    = ($pn - 1) * $ps;
         if (empty($userId) || empty($belong)) {
             return json(error('缺少必要的参数'));
         }
@@ -107,7 +108,9 @@ class Customer extends Base
             if (empty($userInfo)) {
                 return json(error('参数错误'));
             }
-            $where['belongUserId'] = $userInfo['name'];
+            if ($isCharge == 1) {
+                $where['belongUserId'] = $userInfo['name'];
+            }
         }
         else {
             $where['belongUserId'] = [];
@@ -120,10 +123,22 @@ class Customer extends Base
         }
         $data        = $this->mod->get($where, $start, $ps);
         $customerIds = array_column(iterator_to_array($data), 'id');
-        $data_record = $this->mod_record->get([
-            '$or'        => [['userId' => $userId], ['status' => 2]],
+
+        if ($isCharge == 1) {
+            $or = [['userId' => $userId], ['status' => 2]];
+            $data_record = $this->mod_record->get([
+                '$or'        => $or,
+                'customerId' => ['$in' => $customerIds]
+            ]);
+        } else {
+            $data_record = $this->mod_record->get([
+                'customerId' => ['$in' => $customerIds]
+            ]);
+        }
+        /*$data_record = $this->mod_record->get([
+            '$or'        => $or,
             'customerId' => ['$in' => $customerIds]
-        ]);
+        ]);*/
         $list_record = [];
         foreach ($data_record as $item) {
             if (!isset($list_record[$item['customerId']])) {
@@ -262,7 +277,7 @@ class Customer extends Base
             'customerId'   => $id,
             'customerName' => $name,
             'title'        => $title,
-            'time'         => $time,
+            'time'         => date('Y-m-d',strtotime($time)),
             'remark'       => $remark,
             'status'       => $status,              //1: 仅自己可见  2：所有人可见
             'create'       => strtotime($time),
@@ -281,15 +296,21 @@ class Customer extends Base
 
     public function getRecord()
     {
-        $userId = input('userId');
-        $id     = input('id');
-        $pn     = input('pn', 1);
+        $userId   = input('userId');
+        $id       = input('id');
+        $pn       = input('pn', 1);
+        $isCharge = input('isCharge',1);
         $ps     = 15;
         $start  = ($pn - 1) * $ps;
         if (empty($id) || empty($userId)) {
             return json(error('缺少必要的参数'));
         }
-        $where = ['$or' => [['userId' => $userId], ['status' => 2]], 'customerId' => $id];
+        if ($isCharge == 1) {
+            $where = ['$or' => [['userId' => $userId], ['status' => 2]], 'customerId' => $id];
+        } else {
+            $where = [ 'customerId' => $id];
+        }
+        //$where = ['$or' => [['userId' => $userId], ['status' => 2]], 'customerId' => $id];
         $data  = $this->mod_record->get($where, $start, $ps);
         $list  = [];
         foreach ($data as $item) {
@@ -299,7 +320,7 @@ class Customer extends Base
                 'customerName' => $item['customerName'],
                 'time'         => $item['time'],
                 'remark'       => $item['remark'],
-                'status'       => $item['status'],
+                'status'       => empty($item['status']) ? 1: $item['status'],
             ];
         }
         return json(ok($list));
@@ -338,6 +359,7 @@ class Customer extends Base
             //$item['status'] = $item['status'] == 1 ? '仅自己可见' : '所有人可见';
             $item['status'] = empty($item['status']) ? '' : ($item['status'] == 1 ? '仅自己可见' : '所有人可见' );
             $item['cName']  = $customerName;
+            $item['time']   = date('Y-m-d',strtotime($item['time']));
             $list_record[]  = $item;
         }
         return json(ok($list_record));

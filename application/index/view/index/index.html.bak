@@ -193,7 +193,7 @@
             <div class="top">
                 <div class="left">添加沟通记录</div>
             </div>
-            <div class="list" v-for="(item, index) in recordList">
+            <div class="list" v-for="(item, index) in form.recordList">
                 <div class="item" >
                     <span class="txt">客户名称</span>
                     <input type="text" v-model="item.customer">
@@ -204,7 +204,7 @@
                 </div>
                 <div class="item-bt">
                     <span class="txt">沟通内容</span>
-                    <input type="text" v-model="item.remark">
+                    <textarea  v-model="item.remark"></textarea>
                 </div>
             </div>
 
@@ -225,7 +225,7 @@
             </a>
             <a class="nav-item" href="/index/index/lend">
                 <i class="iconfont icon-jihua"></i>
-                <p>借用</p>
+                <p>借用查询</p>
             </a>
             <a class="nav-item" href="/index/index/customer">
                 <i class="iconfont icon-category"></i>
@@ -377,18 +377,15 @@
                 // 表单提交
                 submit: function () {
                     var self = this;
-                    var formData = {
-                        'userId': self.userInfo.userid,
-                        'username': self.userInfo.userName,
-                        'isCharge': self.userInfo.isCharge,
-                        'recordList' : self.recordList
-                    };
-
-                    ajax.post('/api/customer/indexRecordAdd',formData, function (resp) {
-                        alert(resp.ret);
+                    //alert(formData['recordList'][0]['customer']);
+                    //alert(self.recordList[0]['customer']);
+                    //alert(JSON.stringify(self.form));
+                    //alert(util.getTime());
+                    //alert(Qs.stringify(self.form));
+                    ajax.post('/api/customer/indexRecordAdd',self.form, function (resp) {
                         if (resp.ret) {
                             ding.toast('添加成功');
-                            self.recordList = [{}];
+                            self.form.recordList = [{}];
                         } else {
                             ding.toast(resp.msg);
                         }
@@ -407,6 +404,9 @@
                 ding.ready(function () {
                     ding.getUserInfo(function (resp) {
                         self.userInfo = resp.data;
+                        self.form.userId = self.userInfo.userid;
+                        self.form.username = self.userInfo.name;
+                        self.form.isCharge = self.userInfo.isCharge;
                         self.getData();
                     });
                 });

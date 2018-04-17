@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>客户沟通记录</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/mobile/iconfont/iconfont1.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+    <div class="container productTime nav-fixed-bottom" id="app" v-cloak>
+
+        <div class="list" v-for="(item, index) in listData">
+
+            <!--<a class="item" :href="'/index/index/productTimeDetail?id='+ item.id" >-->
+            <!--<a class="item" :href="'/index/index/communication?id='+ item.id" >-->
+            <div class="item">
+                <div class="title">
+                    <span class="left">{{item.cName}}</span>
+                    <span class="right">{{item.time}}</span>
+                </div>
+                <div class="content">
+
+                    <!--上线前删除-->
+                   <!-- <div class="row">
+                        <span class="row-left">item.id</span>
+                        <span class="row-right">{{item.id}}</span>
+                    </div>-->
+                    <div class="row">
+                        <span class="row-left">标题</span>
+                        <span class="row-right">{{item.title}}</span>
+                    </div>
+                    <div class="row">
+                        <span class="row-left">销售人员</span>
+                        <span class="row-right">{{item.userName}}</span>
+                    </div>
+                    <div class="row">
+                        <span class="row-left">沟通对象</span>
+                        <span class="row-right">{{item.customerName}}</span>
+                    </div>
+                    <div class="row-bt">
+                        <span class="row-left">内容</span>
+                        <span class="row-r">{{item.remark}}</span>
+                    </div>
+                </div>
+            <!--</a>-->
+            </div>
+        </div>
+
+        <div class="no-data" v-show="isNoData">暂无数据</div>
+
+
+        <div class="nav">
+            <a class="nav-item " href="/index/index">
+                <i class="iconfont icon-gongzuotai1"></i>
+                <p>工作台</p>
+            </a>
+            <a class="nav-item" href="/index/index/order">
+                <i class="iconfont icon-zichanxinxibuquancelve"></i>
+                <p>订单查询</p>
+            </a>
+            <a class="nav-item" href="/index/index/lend">
+                <i class="iconfont icon-jihua"></i>
+                <p>借用查询</p>
+            </a>
+            <a class="nav-item" href="/index/index/customer">
+                <i class="iconfont icon-category"></i>
+                <p>客户</p>
+            </a>
+            <!--<a class="nav-item nav-active" href="/index/index/agent">
+                <i class="iconfont icon-dailishangguanli"></i>
+                <p>代理商</p>
+            </a>-->
+
+            <!--  v-if="userInfo.roleName === '主管'"   -->
+            <a v-if="userInfo.roleName === '主管'" href="/index/index/customerRecord" class="nav-item">
+                <i class="iconfont icon-chanpin"></i>
+                <p>沟通记录</p>
+            </a>
+        </div>
+
+    </div>
+
+    <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+    <script src="/static/js/dingding.js"></script>
+    <script src="/static/js/util.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                isNoData: false,
+                userInfo: {},
+                pn: 1,
+                listData: [],
+                isHasNext: true,
+                isLoading: false
+            },
+            methods: {
+                getData: function(){
+                    var self = this;
+                    //ding.showLoading();
+
+                    axios.get('/api/customer/getRecordList', {
+                        params: {
+                            pn: self.pn
+                        }
+                    }).then(function (resp) {
+                        //ding.hideLoading();
+                        if (resp.data.data.length < 15) {
+                            self.isHasNext = false;
+                        }
+                        self.listData = self.listData.concat(resp.data.data);
+                        //alert(self.listData[0]);
+                        if (self.listData.length == 0) {
+                            self.isNoData = true;
+                        }
+                    })
+                }
+            },
+            created: function(){
+                var self = this;
+
+                ding.ready(function(){
+                    ding.getUserInfo(function(resp){
+                        self.userInfo = resp.data;
+                        //alert(self.userInfo.roleName);
+                        self.getData();
+                    });
+                });
+
+                this.$nextTick(function(){
+                    util.loadMore(function(){
+                        if (!self.isHasNext) {
+                            ding.toast('没有更多数据', 2);
+                            return;
+                        }
+                        if (self.isLoading) {
+                            return;
+                        }
+                        self.pn += 1;
+                        self.getData();
+                    })
+                })
+            }
+        })
+
+    </script>
+</body>
+</html>

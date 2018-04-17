@@ -559,24 +559,24 @@ class Agent extends Base
         $result = [];
         foreach ($agent_data as $agent_item) {
             $id = $agent_item['id'];
-            /*$flag = 'agent';
+            $flag = 'agent';
             if  ($agent_item['type'] === 1 ) {
                 $type = 3;
             } else if ($agent_item['type'] === 2 ) {
                 $type = 4;
             }
-            $this->mod->update([
+            /*$this->mod->mod_agent([
                 'type' => $type,
                 'flag' => $flag
             ],$id);*/
-            $city                   = '';
+            /*$city                   = '';
             $cooperationSituation   = '';
             $customerRating         = '';
             $intermediaryCompany    = '';
             $lastProgramme          = '';
             $province               = '';
             $salesFunnel            = '';
-            $stage                  = '';
+            $stage                  = '';*/
 
             /*$this->mod_agent->update([
                 'city'                  => $city,
@@ -593,14 +593,14 @@ class Agent extends Base
 
     public function updateAgentRecord ()
     {
-        $data = $this->mod_record->get();
+        $data = $this->mod_agentRecord->get();
         foreach ($data as $record_item) {
             $id = $record_item['id'];
             $type = 2;
 
-            $this->mod_record->update([
+            /*$this->mod_agentRecord->update([
                 'type' => $type
-            ],$id);
+            ],$id);*/
         }
     }
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
@@ -34,25 +35,27 @@
                         <span class="row-left">所属项目</span>
                         <span class="row-right">{{item.C_ssxm}}</span>
                     </div>-->
-                    <div class="row">
-                        <span class="row-left">销售人员</span>
-                        <span class="row-right">{{item.E_xsry}}</span>
-                    </div>
-                    <div class="row">
-                        <span class="row-left">借用数量</span>
-                        <span class="row-right">{{item.G_jysl}}</span>
-                    </div>
                     <!--<div class="row">
                         <span class="row-left">付款比例</span>
                         <span class="row-right">{{item.K_fkbl}}</span>
                     </div>-->
-                    <div class="row">
-                        <span class="row-left">归还数量</span>
-                        <span class="row-right">{{item.H_ghsl}}</span>
+                    <div class="row-bt">
+                        <span class="row-left-l">销售人员</span>
+                        <span class="row-right-r">{{item.E_xsry}}</span>
                     </div>
-                    <div class="row">
-                        <span class="row-left">到期时间</span>
-                        <span class="row-right">{{item.K_dqsj}}</span>
+                    <div class="row-bt">
+                        <span class="row-left-l">到期时间</span>
+                        <span class="row-right-r">{{item.K_dqsj}}</span>
+                    </div>
+
+                    <div class="row-bt">
+                        <span class="row-left-l">借用数量</span>
+                        <span class="row-right-r">{{item.G_jysl}}</span>
+                    </div>
+
+                    <div class="row-bt">
+                        <span class="row-left-l">归还数量</span>
+                        <span class="row-right-r">{{item.H_ghsl}}</span>
                     </div>
 
                 </div>
@@ -60,121 +63,126 @@
         </div>
 
         <div class="no-data" v-show="isNoData">暂无数据</div>
-    </div>
-    <!-- v-if -->
-    <div class="nav">
-        <a class="nav-item " href="/index/index">
-            <i class="iconfont icon-gongzuotai1"></i>
-            <p>工作台</p>
-        </a>
-        <a class="nav-item" href="/index/index/order">
-            <i class="iconfont icon-zichanxinxibuquancelve"></i>
-            <p>订单查询</p>
-        </a>
-        <a class="nav-item" href="/index/index/lend">
-            <i class="iconfont icon-jihua"></i>
-            <p>借用查询</p>
-        </a>
-        <a class="nav-item" href="/index/index/customer">
-            <i class="iconfont icon-category"></i>
-            <p>客户</p>
-        </a>
-        <!--<a class="nav-item nav-active" href="/index/index/agent">
+        <!-- v-if -->
+        <div class="nav" v-if="userInfo.userid">
+            <a class="nav-item " href="/index/index">
+                <i class="iconfont icon-gongzuotai1"></i>
+                <p>工作台</p>
+            </a>
+            <a class="nav-item" href="/index/index/order">
+                <i class="iconfont icon-zichanxinxibuquancelve"></i>
+                <p>订单查询</p>
+            </a>
+            <a class="nav-item nav-active" href="/index/index/lend">
+                <i class="iconfont icon-jihua"></i>
+                <p>借用查询</p>
+            </a>
+            <a class="nav-item" href="/index/index/customer">
+                <i class="iconfont icon-category"></i>
+                <p>客户</p>
+            </a>
+            <!--<a class="nav-item nav-active" href="/index/index/agent">
             <i class="iconfont icon-dailishangguanli"></i>
             <p>代理商</p>
         </a>-->
-        <!--  v-if="userInfo.roleName === '主管'"   -->
-        <a v-if="userInfo.roleName === '主管'" href="/index/index/customerRecord" class="nav-item">
+            <!--  v-if="userInfo.roleName === '主管'"   -->
+            <!-- <a v-if="userInfo.roleName === '主管'" href="/index/index/customerRecord" class="nav-item">
             <i class="iconfont icon-chanpin"></i>
             <p>沟通记录</p>
-        </a>
+        </a> -->
+            <a v-if="userInfo.roleName === '主管'" href="/index/index/customerRecord" class="nav-item">
+                <i class="iconfont icon-chanpin"></i>
+                <p>沟通记录</p>
+            </a>
+        </div>
     </div>
 
-</body>
+    <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+    <script src="/static/js/dingding.js"></script>
+    <script src="/static/js/util.js"></script>
+    <!--<script src="/mobile/lib/ydui/ydui.js"></script>  -->
+    <!--组件类库-->
+    <!--<script src="/mobile/lib/ydui/ydui.flexible.js"></script> -->
+    <!--自适应类库-->
 
-<script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
-<script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
-<script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
-<script src="/static/js/dingding.js"></script>
-<script src="/static/js/util.js"></script>
-<!--<script src="/mobile/lib/ydui/ydui.js"></script>  -->              <!--组件类库-->
-<!--<script src="/mobile/lib/ydui/ydui.flexible.js"></script> -->      <!--自适应类库-->
-
-<script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            isNoData: false,
-            userInfo: {},
-            keyword: '',
-            pn: 1,
-            listData: [],
-            isHasNext: true,
-            isLoading: false
-        },
-        methods: {
-            search: function () {
-                this.pn = 1;
-                this.isHasNext = true;
-                this.isLoading = false;
-                this.listData = [];
-                this.getData();
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                isNoData: false,
+                userInfo: {},
+                keyword: '',
+                pn: 1,
+                listData: [],
+                isHasNext: true,
+                isLoading: false
             },
-            getData: function () {
+            methods: {
+                search: function () {
+                    this.pn = 1;
+                    this.isHasNext = true;
+                    this.isLoading = false;
+                    this.listData = [];
+                    this.getData();
+                },
+                getData: function () {
+                    var self = this;
+                    ding.showLoading();
+                    // alert(self.userInfo.userid);
+                    //self.isNoData = true;
+                    axios.get('/api/lend/get', {
+                        params: {
+                            userId: self.userInfo.userid,
+                            userName: self.userInfo.name,
+                            F_khmc: self.keyword,
+                            pn: self.pn,
+                            isCharge: self.userInfo.isCharge
+                        }
+                    }).then(function (resp) {
+                        ding.hideLoading();
+                        if (resp.data.data.length < 15) {
+                            self.isHasNext = false;
+                        }
+
+                        self.listData = self.listData.concat(resp.data.data);
+
+                        if (self.listData.length == 0) {
+                            self.isNoData = true;
+                        }
+                    })
+
+                }
+            },
+            created: function () {
                 var self = this;
-                //ding.showLoading();
-
-                //self.isNoData = true;
-                axios.get('/api/lend/get', {
-                    params: {
-                        userId  : self.userInfo.userid,
-                        userName: self.userInfo.name,
-                        F_khmc  : self.keyword,
-                        pn      : self.pn,
-                        isCharge: self.userInfo.isCharge
-                    }
-                }).then(function (resp) {
-
-                    ding.hideLoading();
-                    if (resp.data.data.length < 15) {
-                        self.isHasNext = false;
-                    }
-
-                    self.listData = self.listData.concat(resp.data.data);
-
-                    if (self.listData.length == 0) {
-                        self.isNoData = true;
-                    }
+                ding.ready(function () {
+                    ding.getUserInfo(function (resp) {
+                        self.userInfo = resp.data;
+                        // alert(self.userInfo.roleName);
+                        // alert(2222);
+                        self.getData();
+                    });
+                });
+                //
+                this.$nextTick(function () {
+                    util.loadMore(function () {
+                        if (!self.isHasNext) {
+                            ding.toast('没有更多数据', 2);
+                            return;
+                        }
+                        if (self.isLoading) {
+                            return;
+                        }
+                        self.pn += 1;
+                        self.getData();
+                    })
                 })
 
             }
-        },
-        created: function() {
-            var self = this;
-            ding.ready(function () {
-                ding.getUserInfo(function (resp) {
-                    self.userInfo = resp.data;
-                    //alert(self.userInfo.roleName);
-                    self.getData();
-                });
-            });
-            //
-            this.$nextTick(function(){
-                util.loadMore(function(){
-                    if (!self.isHasNext) {
-                        ding.toast('没有更多数据', 2);
-                        return;
-                    }
-                    if (self.isLoading) {
-                        return;
-                    }
-                    self.pn += 1;
-                    self.getData();
-                })
-            })
-
-        }
-    })
-</script>
+        })
+    </script>
+</body>
 
 </html>

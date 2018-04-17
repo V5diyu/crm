@@ -53,7 +53,7 @@ class OrderInfo extends Base
         } else if ($order == 2) {
             $sort = ['H_fhbl' => 1,'N_wkdqr' => -1];
         } else {
-            $sort = ['H_fhbl' => 1, 'B_htqyrq'=> -1];
+            $sort = ['H_fhbl' => 1, 'T_jqrq'=> -1];
         }
         if (!empty($D_khdw)) {
             $where['D_khdw'] = ['$regex' => $D_khdw, '$options' => 'i'];
@@ -71,7 +71,8 @@ class OrderInfo extends Base
                 'H_fhbl' => $item['H_fhbl'] . '%',
                 'J_fkje' => empty($item['J_fkje']) ? 0 : $item['J_fkje'],
                 'K_fkbl' => round($item['K_fkbl'], 3) . '%',
-                'N_wkdqr'=> empty($item['N_wkdqr']) ? '全部发货未完成' : date('Y-m-d',$item['N_wkdqr'])
+                'N_wkdqr'=> empty($item['N_wkdqr']) ? '全部发货未完成' : date('Y-m-d',$item['N_wkdqr']),
+                'T_jqrq' => empty($item['T_jqrq']) ? date('Y-m-d',strtotime(date('Y-m-d',$item['B_htqyrq']) . ' +5 days')) : date('Y-m-d',$item['T_jqrq']),
             ];
         }
         return json(ok($list));
@@ -89,6 +90,7 @@ class OrderInfo extends Base
         $info['H_fhbl'] = round($info['H_fhbl'],3) . '%';
         $info['J_fkje'] = empty($info['J_fkje']) ? 0 : $info['J_fkje'];
         $info['K_fkbl'] = round($info['K_fkbl'], 3) . '%';
+        $info['T_jqrq'] = empty($info['T_jqrq']) ? date('Y-m-d',strtotime(date('Y-m-d',$info['B_htqyrq']) . ' +5 days')) : date('Y-m-d',$info['T_jqrq']);
         //$info['K_fkbl'] = round($info['K_fkbl'] * 100, 2) . '%';
 
         $contract = $info['A_hth'];

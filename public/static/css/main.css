@@ -115,17 +115,19 @@
     align-items: center;
     background: #FFFFFF;
     padding: 10px 15px;
-    border-top: 1px solid #e8e8e8;
-    border-bottom: 1px solid #e8e8e8;
+    /* border-top: 1px solid #e8e8e8;
+    border-bottom: 1px solid #e8e8e8; */
     margin: .1rem 0;
 }
 .index .notice .left{
+    width: 5px;
+    height: 5px;
     position: relative;
     margin-right: 15px;
 }
 .index .notice .left .iconfont{
     color: #1295D9;
-    font-size: .2rem;
+    font-size: .15rem;
 }
 .index .notice .center{
     flex: 1;
@@ -649,20 +651,58 @@
     font-size: .14rem;
     border-bottom: 1px solid #f3f3f3;
 }
+/* 修改的代码 */
+.productTime .list .item .content .row-bt{
+    display: flex;
+    display: inline-block;
+    flex-wrap: wrap;
+    width: 48%;
+    padding: 5px 15px;
+    height: 100%;
+    /* display: flex;
+    align-items: center; */
+    
+}
+
+.productTime .list .item .content .row-bt .row-left-l{
+    flex: 1;
+    color: #999;
+    font-size: .12rem;
+}
+.productTime .list .item .content .row-bt .row-right-r{
+    float: right;
+    color: #999;
+    font-size: .12rem;
+}
+
+
 .productTime .list .item .content .row{
-    padding: 0 15px;
-    height: .28rem;
+    padding: 5px 15px;
+    height: 100%;
     display: flex;
     align-items: center;
+    
 }
+
 .productTime .list .row-left{
     flex: 1;
     color: #999;
     font-size: .12rem;
 }
 .productTime .list .row-right{
+    float: right;
     color: #999;
     font-size: .12rem;
+}
+/* 修改的代码 */
+.productTime .list .item .content .row-bts {
+    padding: 0px 15px 5px 15px;
+}
+.productTime .list .item .content .row-bts .row-r{
+    display: block;
+    color: #666;
+    font-size: .14rem;
+    margin-top: 5px;
 }
 /** productTimeDetail **/
 .productTimeDetail .list{
@@ -812,7 +852,6 @@
     font-size: .12rem;
     background-color: #e8e8e8;
 }
-
 .customerType-box .type:first-child{
     border-radius: 4px 0 0 4px;
 }
@@ -823,33 +862,6 @@
     color: #fff;
     background-color: #1295D9;
 }
-
-.order-box {
-    display: flex;
-}
-
-.order-box .type {
-    display: inline-block;
-    width: 2.6rem;
-    height: .3rem;
-    line-height: .3rem;
-    text-align: center;
-    color: #666;
-    font-size: .12rem;
-    background-color: #e8e8e8;
-}
-.order-box .type:first-child{
-    border-radius: 4px 0 0 4px;
-}
-
-.order-box .type:last-child{
-    border-radius: 0 4px 4px 0;
-}
-.order-box .type-active{
-    color: #fff;
-    background-color: #1295D9;
-}
-
 .addCustomer .baseinfo .title{
     height: .4rem;
     line-height: .4rem;
@@ -965,4 +977,33 @@
     border: 1px solid #f3f3f3;
     border-radius: 2px;
     text-indent: 10px;
+}
+
+
+
+/*order-box */
+.productTime .order-box {
+    display: flex;
+}
+
+.productTime .order-box .type {
+    display: inline-block;
+    width: 2.6rem;
+    height: .3rem;
+    line-height: .3rem;
+    text-align: center;
+    color: #666;
+    font-size: .12rem;
+    background-color: #e8e8e8;
+}
+.productTime .order-box .type:first-child{
+    border-radius: 4px 0 0 4px;
+}
+
+.productTime .order-box .type:last-child{
+    border-radius: 0 4px 4px 0;
+}
+.productTime .order-box .type-active{
+    color: #fff;
+    background-color: #1295D9;
 }

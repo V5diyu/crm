@@ -249,21 +249,21 @@ return [
         'username' => 'root',
         'password' => 'yelangying'
     ],
-    /*'dingding' => [
+    'dingding' => [
         'corpid'      => 'ding754fc15c56c1f77a',
         'corpsecret'  => 'BW3-7kv-lKRKnub3M0uVXSPjY8pF3NJZAEFzm75gw1ZbCiMQgLTCeg-D40t34RLO',
         'agentId'     => '135592527',
         'apiUrl'      => 'https://oapi.dingtalk.com',
         'processCode' => 'PROC-FF6Y696SO2-I0XPKHY6USV6U0O4NQJB3-9T9RCS9J-2',
-    ],*/
-
-    'dingding' => [
-        'corpid'      => 'dingaf5e12d89641dea835c2f4657eb6378f',
-        'corpsecret'  => '61J7weQADcHTU5WUPwhZoTOiIfLxyfqIqomMsbRNF55brzyirpGVkt2ZaaPJKECy',
-        'agentId'     => '129778405',
-        'apiUrl'      => 'https://oapi.dingtalk.com',
-        'processCode' => 'PROC-GTHKCO8W-MLHP1Y5WRAHSB4KID8YY1-FOWSQ69J-B',
     ],
+    
+    // 'dingding' => [
+    //     'corpid'      => 'dingaf5e12d89641dea835c2f4657eb6378f',
+    //     'corpsecret'  => '61J7weQADcHTU5WUPwhZoTOiIfLxyfqIqomMsbRNF55brzyirpGVkt2ZaaPJKECy',
+    //     'agentId'     => '129778405',
+    //     'apiUrl'      => 'https://oapi.dingtalk.com',
+    //     'processCode' => 'PROC-GTHKCO8W-MLHP1Y5WRAHSB4KID8YY1-FOWSQ69J-B',
+    // ],
 //        'mongodb'  => [
 //            'host'     => '127.0.0.1',
 //            'prot'     => '27017',

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>订单详情</title>
+    <!--<link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">-->
+    <!--<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">-->
+    <link rel="stylesheet" type="text/css" href="/mobile/lib/ydui/ydui.rem.css">
+
+    <style>
+
+        [v-cloak]{
+            display: none;
+        }
+        .ui-title {
+            color: #666666;
+            font-size: 30px;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .project-detail .list-group{
+            padding: .1rem;
+        }
+        .project-detail .list-group .list-item{
+            display: flex;
+            line-height: .6rem;
+            padding: 0 .05rem;
+            background-color: #f5f5f5;
+            border-bottom: 1px dashed #e8e8e8;
+        }
+        .project-detail .list-group .list-item .left{
+            width: 80px;
+        }
+        .project-detail .list-group .list-item .right{
+            text-align: right;
+            flex: 1;
+            word-break: normal;
+        }
+
+        .project-detail .rules-title{
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .project-detail .project-flow .iconfont{
+            color: #0bb20c;
+            font-size: .44rem;
+        }
+        .project-detail .project-flow .icon-gantanhao{
+            color: #ef4f4f;
+        }
+        .project-detail .project-flow .icon-shijian{
+            color: #ffb400;
+        }
+    </style>
+
+
+
+
+</head>
+<body>
+    <div class="project-detail" id="app" v-cloak>
+
+        <!--<div class="list">
+            <div class="item">
+                <span class="left">合同号</span>
+                <span class="right">{{order.A_hth}}</span>
+            </div>
+            <div class="item">
+                <span class="left">所属项目</span>
+                <span class="right">{{order.C_ssxm}}</span>
+            </div>
+            <div class="item">
+                <span class="left">客户单位</span>
+                <span class="right">{{order.D_khdw}}</span>
+            </div>
+            <div class="item">
+                <span class="left">总价</span>
+                <span class="right">{{order.E_zj}}</span>
+            </div>
+            <div class="item">
+                <span class="left">销售人员</span>
+                <span class="right">{{order.F_xsry}}</span>
+            </div>
+            <div class="item">
+                <span class="left">发货</span>
+                <span class="right">{{order.G_fh}}</span>
+            </div>
+            <div class="item">
+                <span class="left">发货比例</span>
+                <span class="right">{{order.H_fhbl}}</span>
+            </div>
+
+            <a href="javascript:;" onclick="proClick()"><div class="item">
+                <span class="left">交期时间</span>
+                <span class="right">{{}}</span>
+            </div></a>
+
+            &lt;!&ndash;页面效果测试&ndash;&gt;
+            &lt;!&ndash;<div v-model="ProDetailVisible" class="list">
+                <div v-for="(item, index) in productDetail" class="item">
+                    <div class="content">
+                        <div class="row">
+                            <span class="row-left">品号</span>
+                            <span class="row-right">{{item.E_ph}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">品名</span>
+                            <span class="row-right">{{item.F_pm}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">规格</span>
+                            <span class="row-right">{{item.G_hpgg}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">数量</span>
+                            <span class="row-right">{{item.J_sl}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">销货数量</span>
+                            <span class="row-right">{{item.K_xhsl}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">出库时间</span>
+                            <span class="row-right">{{item.I_ckrq}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">预计发货日期</span>
+                            <span class="row-right">{{item.N_yjfhrq}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>&ndash;&gt;
+            &lt;!&ndash;&ndash;&gt;
+
+            <a href="javascript:;" onclick="billClick()"><div class="item">
+                <span class="left">发票</span>
+                <span class="right">{{order.I_fp}}</span>
+            </div></a>
+
+            &lt;!&ndash;页面效果测试&ndash;&gt;
+            &lt;!&ndash;<div v-model="billDetailVisible" class="list">
+                <div v-for="(item, index) in billDetail" class="item">
+                    <div class="content">
+                        <div class="row">
+                            <span class="row-left">票据号码</span>
+                            <span class="row-right">{{item.A_pjhm}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">票据金额</span>
+                            <span class="row-right">{{item.B_pmje}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">开票时间</span>
+                            <span class="row-right">{{item.C_kpsj}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>&ndash;&gt;
+            &lt;!&ndash;&ndash;&gt;
+
+
+            <div class="item">
+                <span class="left">付款金额</span>
+                <span class="right">{{order.J_fkje}}</span>
+            </div>
+            <div class="item">
+                <span class="left">付款比例</span>
+                <span class="right">{{order.K_fkbl}}</span>
+            </div>
+
+            <a href="javascript:;" onclick="payClick()" ><div class="item">
+                <span class="left">付款详情</span>
+                <span class="right">{{order.L_fkxq}}</span>
+            </div></a>
+
+            &lt;!&ndash;页面效果测试&ndash;&gt;
+            &lt;!&ndash;<div v-model="payDetailVisible" class="list">
+                <div v-for="(item, index) in payDetail" class="item">
+                    <div class="content">
+                        <div class="row">
+                            <span class="row-left">付款金额</span>
+                            <span class="row-right">{{item.payment}}</span>
+                        </div>
+                        <div class="row">
+                            <span class="row-left">付款时间</span>
+                            <span class="row-right">{{item.paydate}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>&ndash;&gt;
+            &lt;!&ndash;&ndash;&gt;
+
+            <div class="item">
+                <span class="left">欠款金额</span>
+                <span class="right">{{order.M_qkje}}</span>
+            </div>
+            <div class="item">
+                <span class="left">财务后续处理意见</span>
+                <span class="right">{{order.P_cwhxclyj}}</span>
+            </div>
+            <div class="item">
+                <span class="left">销售处理反馈</span>
+                <span class="right">{{order.Q_xsclfk}}</span>
+            </div>
+        </div>-->
+
+        <yd-preview :buttons="[]">
+            <yd-preview-header>
+                <div slot="left">合同号</div>
+                <div slot="right">{{order.A_hth}}</div>
+            </yd-preview-header>
+            <yd-preview-item>
+                <div slot="left">所属项目</div>
+                <div slot="right">{{order.C_ssxm}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">客户单位</div>
+                <div slot="right">{{order.D_khdw}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">总价</div>
+                <div slot="right">{{order.E_zj}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">销售人员</div>
+                <div slot="right">{{order.F_xsry}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">发货</div>
+                <div slot="right">{{order.G_fh}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">发货比例</div>
+                <div slot="right">{{order.H_fhbl}}</div>
+            </yd-preview-item>
+            <!--<yd-preview-item>
+                <div slot="left">交期时间</div>
+                <div slot="right"></div>
+            </yd-preview-item>-->
+            <yd-preview-item>
+                <div slot="left">发票</div>
+                <div slot="right">{{order.I_fp}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">付款金额</div>
+                <div slot="right">{{order.J_fkje}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">付款比例</div>
+                <div slot="right">{{order.K_fkbl}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">付款详情</div>
+                <div slot="right">{{order.L_fkxq}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">欠款金额</div>
+                <div slot="right">{{order.M_qkje}}</div>
+            </yd-preview-item>
+            <!--<yd-preview-item>
+                <div slot="left">财务后续处理意见</div>
+                <div slot="right">{{order.P_cwhxclyj}}</div>
+            </yd-preview-item>
+            <yd-preview-item>
+                <div slot="left">销售处理反馈</div>
+                <div slot="right">{{order.Q_xsclfk}}</div>
+            </yd-preview-item>-->
+        </yd-preview>
+
+        <yd-accordion style="margin-top: 5px;">
+            <yd-accordion-item title="交期信息">
+                <div class="list-group" v-for="(item, index) in productDetail">
+                    <div class="list-item">
+                        <div class="left">交期单</div>
+                        <div class="right">{{item.D_dh}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">品号</div>
+                        <div class="right">{{item.E_ph}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">品名</div>
+                        <div class="right">{{item.F_pm}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">规格</div>
+                        <div class="right">{{item.G_hpgg}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">数量</div>
+                        <div class="right">{{item.J_sl}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">销货数量</div>
+                        <div class="right">{{item.K_xhsl}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">出库时间</div>
+                        <div class="right">{{item.I_ckrq}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">预计发货时间</div>
+                        <div class="right">{{item.N_yjfhrq}}</div>
+                    </div>
+                </div>
+            </yd-accordion-item>
+
+            <yd-accordion-item title="发票信息">
+                <div class="list-group" v-for="(item, index) in billDetail">
+                    <div class="list-item">
+                        <div class="left">票据号码</div>
+                        <div class="right">{{item.A_pjhm}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">票面金额</div>
+                        <div class="right">{{item.B_pmje}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">开票时间</div>
+                        <div class="right">{{item.C_kpsj}}</div>
+                    </div>
+                </div>
+            </yd-accordion-item>
+
+            <yd-accordion-item title="付款信息">
+                <div class="list-group" v-for="(item, index) in payDetail" >
+                    <div class="list-item">
+                        <div class="left">付款金额</div>
+                        <div class="right">{{item.payment}}</div>
+                    </div>
+                    <div class="list-item">
+                        <div class="left">付款时间</div>
+                        <div class="right">{{item.paydate}}</div>
+                    </div>
+                </div>
+            </yd-accordion-item>
+        </yd-accordion>
+
+        <!--<div class="btn-error-box">-->
+        	<!--<div class="btn-error" @click="correctError">我要纠错</div>-->
+        <!--</div>-->
+    </div>
+
+    <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+    <script src="/mobile/lib/ydui/ydui.flexible.js"></script>       <!--自适应类库-->
+    <script src="/mobile/lib/ydui/ydui.js"></script>                <!--组件类库-->
+    <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+    <script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+    <script src="/static/js/dingding.js"></script>
+    <script src="/static/js/util.js"></script>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                userInfo: {},
+                order: {},
+                productDetail:{},
+                payDetail:{},
+                billDetail:{},
+                billDetailVisible:false,
+                payDetailVisible:false,
+                proDetailVisible:false
+            },
+            methods: {
+                correctError: function () {
+                    var self = this;
+                    ding.prompt(function (resp) {
+                        if (resp.buttonIndex == 0) {
+
+                            if (!resp.value) {
+                                ding.toast('请输入纠错信息')
+                                return;
+                            }
+
+                            axios.get('/api/order_info/correctError', {
+                                params: {
+                                    id: util.getParams('id'),
+                                    userId: self.userInfo.userid,
+                                    userName: self.userInfo.name,
+                                    content: resp.value
+                                }
+                            }).then(function (resp) {
+                                if (resp.data.ret) {
+                                    ding.toast('纠错信息提交成功')
+                                }else{
+                                    ding.toast(resp.data.msg);
+                                }
+
+                            })
+                        }
+                    }, '请输入纠错信息')
+                },
+                getData: function () {
+                    var self = this;
+                    ding.showLoading();
+                    axios.get('/api/order_info/getInfo', {
+                        params: {
+                            id: util.getParams('id')
+                        }
+                    }).then(function (resp) {
+                        console.log(resp.data.data)
+                        ding.hideLoading();
+                        self.order = resp.data.data.order;
+                        //alert(self.order);
+                        self.productDetail = resp.data.data.productDetail;
+                        //alert(self.productDetail);
+                        self.payDetail = resp.data.data.payDetail;
+                        //alert(self.payDetail);
+                        self.billDetail = resp.data.data.billDetail;
+                        //alert(self.billDetail);
+
+                    })
+                },
+                payClick: function () {
+                    var self = this;
+                    if (self.payDetailVisible) {
+                        self.payDetailVisible = false;
+                    } else {
+                        self.payDetailVisible = true;
+                    }
+                },
+                billClick: function () {
+                    var self = this;
+                    if (self.billDetailVisible) {
+                        self.billDetailVisible = false;
+                    } else {
+                        self.billDetailVisible = true;
+                    }
+                },
+                proClick: function () {
+                    var self = this;
+                    if (self.proDetailVisible) {
+                        self.proDetailVisible = false;
+                    } else {
+                        self.proDetailVisible = true;
+                    }
+
+                }
+            },
+            created: function () {
+                var self = this;
+
+                ding.ready(function () {
+                    ding.getUserInfo(function (resp) {
+                        self.userInfo = resp.data;
+                        self.getData();
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

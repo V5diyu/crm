@@ -127,7 +127,9 @@ class ProductDelivery extends Base
         $count = $this->mod_data->count($where);
         $list  = [];
         foreach ($data as $item) {
-            $item['N_yjfhrq'] = is_int($item['N_yjfhrq']) ? date('Y-m-d', $item['N_yjfhrq']) : $item['N_yjfhrq'];
+            $item['J_sl']   = (int)$item['J_sl'];
+            $item['I_ckrq'] = is_int($item['I_ckrq']) ? date('Y-m-d', $item['I_ckrq']) : $item['I_ckrq'];
+            $item['N_yjfhrq'] = empty($item['N_yjfhrq']) ? '' : (is_int($item['N_yjfhrq']) ? date('Y-m-d', $item['N_yjfhrq']) : $item['N_yjfhrq']);
             $list[]           = $item;
         }
         return json(ok(['list' => $list, 'count' => $count]));
@@ -178,7 +180,7 @@ class ProductDelivery extends Base
             'F_pm'     => $F_pm,
             'G_hpgg'   => $G_hpgg,
             'H_dw'     => $H_dw,
-            'I_ckrq'   => $I_ckrq,
+            'I_ckrq'   => strtotime($I_ckrq) ? strtotime($I_ckrq) : $I_ckrq,
             'J_sl'     => $J_sl,
             'K_xhsl'   => $K_xhsl,
             'L_wzxhsl' => $L_wzxhsl,

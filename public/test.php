@@ -1,159 +1,215 @@
 <?php
 
-
-
-
 die();
 
-include_once('C:\xampp\htdocs\application\dbhelp\SalespersonReceiveDB.php');
-include_once('C:\xampp\htdocs\application\dbhelp\OrderInfoDB.php');
+include_once('C:\xampp\htdocs\application\dbhelp\LendDB.php');                  //借用表
+include_once('C:\xampp\htdocs\application\dbhelp\BillDB.php');
+include_once('C:\xampp\htdocs\application\dbhelp\ProductDeliveryDataDB.php');
+include_once('C:\xampp\htdocs\application\dbhelp\AutosynLogDb.php');            //同步表
 include_once('C:\xampp\htdocs\application\dbhelp\OrderInfoDataDB.php');
-include_once('C:\xampp\htdocs\application\dbhelp\SalespersonStatisticsDB.php');
-include_once('C:\xampp\htdocs\application\dbhelp\CompanyStatisticsDB.php');
-include_once('C:\xampp\htdocs\application\dbhelp\OrderPayDetailDb.php');
-include_once('C:\xampp\htdocs\application\dbhelp\AutosynLogDb.php');
-
 date_default_timezone_set("PRC");
 
 $servern="localhost";
-$coninfo=array("Database"=>"DB_TK01","UID"=>"sa","PWD"=>"SAsa123","CharacterSet"=>"utf-8");
+$coninfo=array("Database"=>"DB_ZJTK","UID"=>"sa","PWD"=>"SAsa123","CharacterSet"=>"utf-8");
 
-/*$servern="47.104.133.136";
-$coninfo=array("Database"=>"DB_TLU","UID"=>"sa","PWD"=>"SAsa123 ","CharacterSet"=>"utf-8");*/
 $conn=sqlsrv_connect($servern,$coninfo) or die ("connect deny!");
 if($conn){
-    echo "OK ! HELLO SQL SERVER<br />";
+    echo "OK ! HELLO SQL SERVER";
 } else {
     echo "Connection could not be established.";
-    die( print_r(sqlsrv_errors(), true)); 
+    die( print_r(sqlsrv_errors(), true));
 }
 
-$mod_data                  = new OrderInfoDataDB();
-$mod_autoSynLog            = new AutosynLogDb();
-$mod_salespersonStatistics = new SalespersonStatisticsDB();
-$mod_companyStatistics     = new CompanyStatisticsDB();
-$mod_payDetail             = new OrderPayDetailDb();
-$mod_personReceive         = new SalespersonReceiveDB();
+$mod_lend           = new LendDB();
+$mod_autoSynLog     = new AutosynLogDb();
+$mod_bill           = new BillDB();
+$mod_product        = new ProductDeliveryDataDB();
+$mod_order          = new OrderInfoDataDB();
+//间隔时间
+$time_current = time();
+$time_pre = time() - 60*30;
+//$str_current = date('Y-m-d H:i:s',$time_current);
+//$str_pre = date('Y-m-d H:i:s',$time_pre);
+$str_current = "2018-10-01 00:00:00";
+$str_pre     = "2015-01-01 00:00:00";
+
+$product_arr    = [];
+$bill_arr       = [];
+$lend_arr       = [];
+
+$product_list   = [];
+$bill_list      = [];
+$lend_list      = [];
+
+//借用(缺少单价或者借用总价)
+//借用(缺少单价或者借用总价)
+//$sql_lend  = "select m.bl_no as A_dh, t.prd_no as B_ph, t.prd_name as C_pm, t.amt as price, m.BL_DD as lenddate,m.EST_DD as returndate,t.qty as G_jysl,t.qty_rtn as H_ghsl,(select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman   from TF_BLN t,MF_BLN m where t.BL_NO = m.BL_NO and  ((m.BL_DD >='2015-01-01 00:00:00' AND m.bl_DD<'2019-01-01 00:00:00') or (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') or (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) and m.bl_id = 'LN'";
+
+//发票
+//$sql_bill = "select lz_no, lz_dd, amt,cas_no  from mf_lz m where ((m.lz_dd >='2015-01-01 00:00:00' AND m.lz_dd<'2019-01-01 00:00:00') OR (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') OR (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) AND m.lz_id = 'LO' ";
+
+//交期
+//$sql_product = "select t.ck_no as D_dh, t.prd_no as E_ph, t.prd_name as F_pm,t.ck_dd, t.prd_mark as G_hpgg,t.unit as H_dw,t.REM as O_bz,t.qty as J_sl,t.est_dd,t.qty_ps as L_wzxhsl, m.cus_os_no as C_gcah, (select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman from tf_ck t,mf_ck m where t.ck_no = m.ck_no and ((m.ck_dd >='2015-01-01 00:00:00' AND m.ck_dd<'2019-01-01 00:00:00') or (m.Modify_dd >='2015-01-01 00:00:00' AND m.Modify_dd<'2019-01-01 00:00:00') or (m.sys_date >='2015-01-01 00:00:00' AND m.sys_date<'2019-01-01 00:00:00')) and t.ck_id = 'CK'";
+
+$sql_lend  = "select m.bl_no as A_dh, t.prd_no as B_ph, t.prd_name as C_pm, t.amt as price, m.BL_DD as lenddate,m.EST_DD as returndate,t.qty as G_jysl,t.qty_rtn as H_ghsl,(select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman   from TF_BLN t,MF_BLN m where t.BL_NO = m.BL_NO and  ((m.BL_DD >='". $str_pre ."' AND m.bl_DD<'". $str_current ."') or (m.Modify_dd >='". $str_pre ."' AND m.Modify_dd<'" . $str_current . "') or (m.sys_date >='". $str_pre ."' AND m.sys_date<'". $str_current ."')) and m.bl_id = 'LN'";
+
+//发票
+$sql_bill = "select lz_no, lz_dd, amt,cas_no  from mf_lz m where ((m.lz_dd >='". $str_pre ."' AND m.lz_dd<'". $str_current ."') OR (m.Modify_dd >='". $str_pre ."' AND m.Modify_dd<'". $str_current ."') OR (m.sys_date >='". $str_pre ."' AND m.sys_date<'". $str_current ."')) AND m.lz_id = 'LO' ";
+
+//交期
+$sql_product = "select t.ck_no as D_dh, t.prd_no as E_ph, t.prd_name as F_pm,t.ck_dd, t.prd_mark as G_hpgg,t.unit as H_dw,t.REM as O_bz,t.qty as J_sl,t.est_dd,t.qty_ps as L_wzxhsl, m.cus_os_no as C_gcah, (select c.name from CUST c where c.cus_no= m.cus_no)as customer,(select s.Name from SALM s where s.sal_no = m.sal_no) as salesman from tf_ck t,mf_ck m where t.ck_no = m.ck_no and ((m.ck_dd >='". $str_pre ."' AND m.ck_dd<'". $str_current ."') or (m.Modify_dd >='". $str_pre ."' AND m.Modify_dd<'". $str_current ."') or (m.sys_date >='". $str_pre ."' AND m.sys_date<'". $str_current ."')) and t.ck_id = 'CK'";
 
 
 
-$ret_1 = [];
-$pay_detail = [];
-$data_log = [];
-$sale_man_arr = [];
-$company_arr = [];
-$pay_detail_arr = [];
-$sale_receive_arr = [];
-$str_pre = '2016-01-01 00:00:00';
-$str_current = '2018-03-26 13:30:00';
+$stmt = sqlsrv_query($conn,$sql_lend);
+while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+    $id = getUuid();
+    $arr_1 = (array)$row['lenddate'];
+    $arr_2 = (array)$row['returndate'];
+    //$price = $row['price'];
 
-//$sql_pay_detail = "select min(tm.CAS_NO)  as contract, min(tm.amtn_bb) as payment, min(tm.RP_DD) as paydate, min(tm.rp_no) as payno, min(s.Name) as salesman from  TF_MON tm left join MF_POS p on p.cus_os_no = tm.CAS_NO left join SALM s on s.sal_no = p.sal_no where ((tm.rp_DD >='". $str_pre ."' AND tm.rp_DD<'" . $str_current . "') or (tm.Modify_dd >='". $str_pre ."' AND tm.Modify_dd<'" . $str_current . "') or (tm.sys_date >='". $str_pre ."' AND tm.sys_date<'" . $str_current . "')) and tm.CAS_NO is not null and tm.CAS_NO <>'' and tm.RP_ID =1";
-$sql_pay_detail = "select tm.CAS_NO as contract, min(tm.amtn_bb) as payment, min(tm.RP_DD) as paydate, tm.rp_no as payno, min(s.Name) as salesman from  TF_MON tm left join MF_POS p on p.cus_os_no = tm.CAS_NO left join SALM s on s.sal_no = p.sal_no where ((tm.rp_DD >='". $str_pre ."' AND tm.rp_DD<'" . $str_current . "') or (tm.Modify_dd >='". $str_pre ."' AND tm.Modify_dd<'" . $str_current . "') or (tm.sys_date >='". $str_pre ."' AND tm.sys_date<'" . $str_current . "')) and tm.CAS_NO is not null and tm.CAS_NO <>'' and tm.RP_ID =1 group by tm.CAS_NO,tm.rp_no";
-$stmt = sqlsrv_query($conn,$sql_pay_detail);
-while ($row = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)) {
-    $id_pay = getUuid();
-    $pay_detail[$id_pay]['id'] = getUuid();
-    $pay_detail[$id_pay]['contract'] = $row['contract'];
-    $pay_detail[$id_pay]['payment'] = empty($row['payment']) ? 0 : (round($row['payment']));
-    $pay_detail[$id_pay]['paydate'] = $row['paydate'];
-    $pay_detail[$id_pay]['payno']   = $row['payno'];
-    $pay_detail[$id_pay]['name']    = empty($row['salesman']) ? 'noName' : $row['salesman'];
+    $lend_arr[$id]['id'] = $id;
+    $lend_arr[$id]['A_dh']   = $row['A_dh'];
+    $lend_arr[$id]['B_ph']   = $row['B_ph'];
+    $lend_arr[$id]['C_pm']   = $row['C_pm'];
+    $lend_arr[$id]['D_zj']   = $row['price'] * $row['G_jysl'];              //直接获取总价或者获取单价根据数量计算
+    $lend_arr[$id]['E_xsry'] = $row['salesman'];
+    $lend_arr[$id]['F_khmc'] = $row['customer'];
+    $lend_arr[$id]['G_jysl'] = strEmptyFloat($row['G_jysl']);
+    $lend_arr[$id]['H_ghsl'] = strEmptyFloat($row['H_ghsl']);
+    $lend_arr[$id]['I_jcsj'] = strtotime($arr_1['date']);
+    $lend_arr[$id]['J_ghsj'] = empty($arr_2) ? '' : strtotime($arr_2['date']);
+    $lend_arr[$id]['K_dqsj'] = strtotime(date('Y-m-d',strtotime($arr_1['date'])) . ' +3 months');
+    $lend_arr[$id]['L_ghbl'] = empty($row['H_ghsl']) ? 0 : floor($row['H_ghsl'] / $row['G_jysl']); 
 
-    $pay_date_arr = (array)$row['paydate'];
-    $pay_time_y = date('Y',strtotime($pay_date_arr['date']));
-    $pay_time_m = date('Y-m',strtotime($pay_date_arr['date']));
-    $pay_detail[$id_pay]['time_y'] = $pay_time_y;
-    $pay_detail[$id_pay]['time_m'] = $pay_time_m;
-
-    unset($row);
+    unset($arr_2) ;
+    unset($arr_1) ;
 }
 
-echo count($pay_detail) , '<br >';
-echo $sql_pay_detail, '<br >';
-//var_dump($pay_detail);
-//die();
+echo '<br >',count($lend_arr);
 
-if (!empty($pay_detail)) {
+$stmt = sqlsrv_query($conn,$sql_product);
+while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+    $id = getUuid();
+    $arr_1 = (array)$row['ck_dd'];
+    $arr_2 = (array)$row['est_dd'];
 
-    $list_payno                 = array_column($pay_detail, 'payno');
-    $data_payDetail             = $mod_payDetail->get(['payno' => ['$in' => $list_payno]]);
-    $data_payno                 = array_column(iterator_to_array($data_payDetail), 'payno');
-    /*$insert_orderData           = [];*/
+    $product_arr[$id]['id']         = $id;
+    $product_arr[$id]['A_khmc']     = $row['customer'];
+    $product_arr[$id]['B_ywy']      = $row['salesman'];
+    $product_arr[$id]['C_gcah']     = $row['C_gcah'];
+    $product_arr[$id]['D_dh']       = $row['D_dh'];
+    $product_arr[$id]['E_ph']       = $row['E_ph'];
+    $product_arr[$id]['F_pm']       = $row['F_pm'];
+    $product_arr[$id]['G_hpgg']     = $row['G_hpgg'];               //
+    $product_arr[$id]['H_dw']       = $row['H_dw'];                 //
+    $product_arr[$id]['I_ckrq']     = strtotime($arr_1['date']);    //
+    $product_arr[$id]['J_sl']       = $row['J_sl'];
+    $product_arr[$id]['K_xhsl']     = $row['J_sl'] - $row['L_wzxhsl'];
+    $product_arr[$id]['L_wzxhsl']   = $row['L_wzxhsl'];
+    $product_arr[$id]['N_yjfhrq']   = empty($arr_2) ? '' : strtotime($arr_2['date']);
+    $product_arr[$id]['O_bz']       = $row['O_bz'];                 //
+}
 
-    foreach ( $pay_detail as $pay_key => $pay_value ) {
+//借用            联合主键
+if (!empty($lend_arr)) {
+    //echo '<br >',count($lend_arr),'<br >';
+    foreach ($lend_arr as $lend_item) {
+        $data_find = $mod_lend->getInfo([ 'A_dh'=> $lend_item['A_dh'], 'B_ph' => $lend_item['B_ph'] ]);
+        if (empty($data_find)) {
+            $lend_list[] = $lend_item;
 
-        if (empty($pay_value['contract'])) {
-            continue;
-        }
-
-        $month_person = $pay_value['time_m'] . '=' . $pay_value['name'];
-        if (!in_array($month_person,$sale_receive_arr)) {
-            $sale_receive_arr[] = $month_person;
-        }
-
-        if (!in_array($pay_value['payno'],$data_payno)) {
-            $pay_detail_arr[] = $pay_value;
+            //=============同步信息
 
         } else {
-            $info       = $mod_payDetail->getInfo(['payno' => $pay_value['payno']]);
+            $id = $data_find['id'];
 
-            $contract   = $pay_value['contract'];
-            $payment    = $pay_value['payment'];
-            $paydate    = $pay_value['paydate'];
-            $payno      = $pay_value['payno'];
-            $name       = $pay_value['name'];
-            $time_m     = $pay_value['time_m'];
+            $D_zj   = $lend_item['D_zj'];
+            $E_xsry = $lend_item['E_xsry'];
+            $F_khmc = $lend_item['F_khmc'];
+            $G_jysl = $lend_item['G_jysl'];
+            $H_ghsl = $lend_item['H_ghsl'];
+            $I_jcsj = $lend_item['I_jcsj'];
+            $J_ghsj = $lend_item['J_ghsj'];
+            $K_dqsj = $lend_item['K_dqsj'];
+            $L_ghbl = $lend_item['L_ghbl'];
 
-            //付款明细更新
-            $mod_payDetail->update([
-                'contract'  => $contract,
-                'payment'   => $payment, 
-                'paydate'   => $paydate, 
-                'payno'     => $payno,
-                'name'      => $name,
-                'time_m'    => $time_m,
-            ], $info['id']);
+            //更新数据
+            $mod_lend->update([
+                'D_zj'      => $D_zj,
+                'E_xsry'    => $E_xsry,
+                'F_khmc'    => $F_khmc,
+                'G_jysl'    => $G_jysl,
+                'H_ghsl'    => $H_ghsl,
+                'I_jcsj'    => $I_jcsj,
+                'J_ghsj'    => $J_ghsj,
+                'K_dqsj'    => $K_dqsj,
+                'L_ghbl'    => $L_ghbl
+            ],$id);
+
+            //=============同步信息
+
         }
-
     }
 }
 
+//交期        联合主键
+if (!empty($product_arr)) {
+    echo '<br >product:',count($product_arr),'<br >';
+    foreach ($product_arr as $product_item) {
 
-//写入付款明细
-if (!empty($pay_detail_arr)) {
-    $mod_payDetail->batchInsert($pay_detail_arr);
-}
+        $data_find = $mod_product->getInfo([ 'D_dh' => $product_item['D_dh'], 'E_ph' => $product_item['E_ph'] ]);
 
+        if (empty($data_find)) {
+            $product_list[] = $product_item;
 
-$list_personReceive    = [];
+            //=============同步信息
+        } else {
 
+            $id = $data_find['id'];
 
-//销售月份回款统计
-if (!empty($sale_receive_arr)) {
-    foreach ( $sale_receive_arr as $receive_key => $receive_value) { 
-        //echo $receive_value, '<br >';
-        $arr_explode = explode('=',$receive_value);
-        $sale_man = $arr_explode[1];
-        $time_m   = $arr_explode[0];
-        $time_y   = date('Y',strtotime($time_m));
-        $mod_personReceive->delete(['name'=>$sale_man,'time_m'=>$time_m]);
-        $info = iterator_to_array($mod_payDetail->get(['time_m'=>$time_m,'name'=>$sale_man]));
-        $list_personReceive[$receive_key]['time']       = $time_m;
-        $list_personReceive[$receive_key]['name']       = $sale_man;
-        $list_personReceive[$receive_key]['time_y']     = $time_y;
-        $list_personReceive[$receive_key]['receive']    = array_sum(array_column($info,"payment"));
+            $A_khmc     = $product_item['A_khmc'];
+            $B_ywy      = $product_item['B_ywy'];
+            $C_gcah     = $product_item['C_gcah'];
+            $D_dh       = $product_item['D_dh'];
+            $E_ph       = $product_item['E_ph'];
+            $F_pm       = $product_item['F_pm'];
+            $G_hpgg     = $product_item['G_hpgg'];
+            $H_dw       = $product_item['H_dw'];
+            $I_ckrq     = $product_item['I_ckrq'];
+            $J_sl       = $product_item['J_sl'];
+            $K_xhsl     = $product_item['K_xhsl'];
+            $L_wzxhsl   = $product_item['L_wzxhsl'];
+            $N_yjfhrq   = $product_item['N_yjfhrq'];
+            $O_bz       = $product_item['O_bz'];
+
+            //更新交期信息
+            $mod_product->update([
+                'A_khmc'    => $A_khmc,
+                'B_ywy'     => $B_ywy,
+                'G_hpgg'    => $G_hpgg,
+                'H_dw'      => $H_dw,
+                'I_ckrq'    => $I_ckrq,
+                'J_sl'      => $J_sl,
+                'K_xhsl'    => $K_xhsl,
+                'L_wzxhsl'  => $L_wzxhsl,
+                'N_yjfhrq'  => $N_yjfhrq,
+                'O_bz'      => $O_bz
+            ],$id);
+            //=============同步信息
+        }
+        //修改订单的交期时间
+        $contract   = $product_item['C_gcah'];
+        $time_jqrq  = $product_item['I_ckrq'];
+        $mod_order->update(['T_jqrq' => $time_jqrq],['A_hth'=>$contract]);
     }
 }
 
-
-//var_dump($list_personReceive);
-
-//写入销售月回款统计
-if (!empty($list_personReceive)) {
-    $mod_personReceive->batchInsert($list_personReceive);
+//写入借用信息
+if (!empty($lend_list)) {
+    echo '<br >',count($lend_list);
+    $mod_lend->batchInsert($lend_list);
 }
-
-
 
 
 function mdb ()
@@ -199,3 +255,4 @@ function strEmptyFloat($str)
     return floatval($str);
 }
 
+sqlsrv_close($conn);

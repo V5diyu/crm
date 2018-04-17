@@ -1,8 +1,5 @@
 <?php
 
-
-//钉钉页面中销项发票使用
-
 class InvoiceDB
 {
 

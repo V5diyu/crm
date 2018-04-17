@@ -453,6 +453,7 @@ class OrderInfo extends Base
         $list  = [];
         foreach ($data as $item) {
             $item['B_htqyrq'] = date('Y-m-d', $item['B_htqyrq']);
+            $item['T_jqrq']   = empty($item['T_jqrq']) ? date('Y-m-d',strtotime($item['B_htqyrq'] . ' +5 days')) : date('Y-m-d',$item['T_jqrq']);
             $item['N_wkdqr']  = empty($item['N_wkdqr']) ? '' : (is_string($item['N_wkdqr']) ? $item['N_wkdqr'] : date('Y-m-d', $item['N_wkdqr']));
             $item['H_fhbl']   = $item['H_fhbl'] . '%';
             $item['K_fkbl']   = $item['K_fkbl'] . '%';
@@ -469,6 +470,7 @@ class OrderInfo extends Base
         }
         $info             = $this->mod_data->getInfo($id);
         $info['B_htqyrq'] = date('Y-m-d', $info['B_htqyrq']);
+        $info['T_jqrq']   = empty($item['T_jqrq']) ? date('Y-m-d',strtotime(date('Y-m-d',$item['B_htqyrq']) . ' +5 days')) : date('Y-m-d',$item['T_jqrq']);
         $info['N_wkdqr']  = empty($info['N_wkdqr']) ? '' : date('Y-m-d', $info['N_wkdqr']);
         return json(ok($info));
     }
@@ -495,6 +497,8 @@ class OrderInfo extends Base
         $P_cwhxclyj = input('P_cwhxclyj');      //财务后续处理意见
         $Q_xsclfk   = input('Q_xsclfk');        //销售处理反馈
 
+        $T_jqrq     = input('T_jqrq');          //订单交期日期
+
         //付款比例由计算得出(类似处理欠款金额)
         $K_fkbl     = empty($E_zj) ? 0 : round($J_fkje / $E_zj, 3) * 100 ;
         $M_qkje     = empty($E_zj) ? 0 : (float)($E_zj - $J_fkje);
@@ -518,6 +522,7 @@ class OrderInfo extends Base
             'O_sfcq'     => $O_sfcq,        //是否超期
             'P_cwhxclyj' => $P_cwhxclyj,    //财务后续处理意见
             'Q_xsclfk'   => $Q_xsclfk,      //销售处理反馈
+            'T_jqrq'     => strtotime($T_jqrq) ? strtotime($T_jqrq) : $T_jqrq,          //交期日期
         ];
 
 
@@ -555,6 +560,7 @@ class OrderInfo extends Base
 
     public function delete()
     {
+        //订单修改（上述步骤已完成修改），销售统计，公司统计数据都要发生变化！！！
         $id = input('id');
         if (empty($id)) {
             return json(error('缺少必要参数'));
@@ -596,15 +602,15 @@ class OrderInfo extends Base
 
         $PHPExcel = new \PHPExcel();
         $PHPSheet = $PHPExcel->getActiveSheet();
-        $name     = '订单信息_' . date('Y-m-d');
-        setExcelTitleStyle($PHPSheet, 17);
-        $PHPSheet->setCellValue("A1", "合同号")->setCellValue("B1", "合同签约日期")->setCellValue("C1", "所属项目")->setCellValue("D1", "客户单位")->setCellValue("E1", "总价")->setCellValue("F1", "销售人员")->setCellValue("G1", "发货")->setCellValue("H1", "发货比例")->setCellValue("I1", "发票")->setCellValue("J1", "付款金额")->setCellValue("K1", "付款比例")->setCellValue("L1", "付款详情")->setCellValue("M1", "欠款金额")->setCellValue("N1", "尾款到期日")->setCellValue("O1", "是否超期")->setCellValue("P1", "财务后续处理意见")->setCellValue("Q1", "销售处理反馈");
+        $name     = '订单信息_' . date('Y-m-d-H-i-s');
+        setExcelTitleStyle($PHPSheet, 18);
+        $PHPSheet->setCellValue("A1", "合同号")->setCellValue("B1", "合同签约日期")->setCellValue("C1", "所属项目")->setCellValue("D1", "客户单位")->setCellValue("E1", "总价")->setCellValue("F1", "销售人员")->setCellValue("G1", "发货")->setCellValue("H1", "发货比例")->setCellValue("I1", "发票")->setCellValue("J1", "付款金额")->setCellValue("K1", "付款比例")->setCellValue("L1", "付款详情")->setCellValue("M1", "欠款金额")->setCellValue("N1", "尾款到期日")->setCellValue("O1", "是否超期")->setCellValue("P1", "财务后续处理意见")->setCellValue("Q1", "销售处理反馈")->setCellValue("T1", "订单交期日期");
         $PHPSheet->setTitle($name);
         $data = $this->mod_data->get($where);
         $i    = 1;
         foreach ($data as $item) {
             $i++;
-            $PHPSheet->setCellValue("A$i", $item['A_hth'])->setCellValue("B$i", date('Y-m-d', $item['B_htqyrq']))->setCellValue("C$i", $item['C_ssxm'])->setCellValue("D$i", $item['D_khdw'])->setCellValue("E$i", $item['E_zj'])->setCellValue("F$i", $item['F_xsry'])->setCellValue("G$i", $item['G_fh'])->setCellValue("H$i", $item['H_fhbl'] . '%')->setCellValue("I$i", $item['I_fp'])->setCellValue("J$i", $item['J_fkje'])->setCellValue("K$i", $item['K_fkbl'] . '%')->setCellValue("L$i", $item['L_fkxq'])->setCellValue("M$i", $item['M_qkje'])->setCellValue("N$i", empty($item['N_wkdqr']) ? '' : date('Y-m-d', $item['N_wkdqr']))->setCellValue("O$i", $item['O_sfcq'])->setCellValue("P$i", $item['P_cwhxclyj'])->setCellValue("Q$i", $item['Q_xsclfk']);
+            $PHPSheet->setCellValue("A$i", $item['A_hth'])->setCellValue("B$i", date('Y-m-d', $item['B_htqyrq']))->setCellValue("C$i", $item['C_ssxm'])->setCellValue("D$i", $item['D_khdw'])->setCellValue("E$i", $item['E_zj'])->setCellValue("F$i", $item['F_xsry'])->setCellValue("G$i", $item['G_fh'])->setCellValue("H$i", $item['H_fhbl'] . '%')->setCellValue("I$i", $item['I_fp'])->setCellValue("J$i", $item['J_fkje'])->setCellValue("K$i", $item['K_fkbl'] . '%')->setCellValue("L$i", $item['L_fkxq'])->setCellValue("M$i", $item['M_qkje'])->setCellValue("N$i", empty($item['N_wkdqr']) ? '' : date('Y-m-d', $item['N_wkdqr']))->setCellValue("O$i", $item['O_sfcq'])->setCellValue("P$i", $item['P_cwhxclyj'])->setCellValue("Q$i", $item['Q_xsclfk'])->setCellValue("Q$i", date('Y-m-d',$item['T_jqrq']));
         }
         $PHPWriter = \PHPExcel_IOFactory::createWriter($PHPExcel, "Excel2007");
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -642,15 +648,18 @@ class OrderInfo extends Base
 
         $PHPExcel = new \PHPExcel();
         $PHPSheet = $PHPExcel->getActiveSheet();
-        $name     = '订单信息_' . date('Y-m-d');
-        setExcelTitleStyle($PHPSheet, 16);
-        $PHPSheet->setCellValue("A1", "合同号")->setCellValue("B1", "合同签约日期")->setCellValue("C1", "客户单位")->setCellValue("D1", "总价")->setCellValue("E1", "销售人员")->setCellValue("F1", "发货")->setCellValue("G1", "发货比例")->setCellValue("H1", "发票")->setCellValue("I1", "付款金额")->setCellValue("J1", "付款比例")->setCellValue("K1", "付款详情")->setCellValue("L1", "欠款金额")->setCellValue("M1", "尾款到期日")->setCellValue("N1", "是否超期")->setCellValue("O1", "财务后续处理意见")->setCellValue("P1", "销售处理反馈");
+        $name     = '订单信息_' . date('Y-m-d-H-i-s');
+        setExcelTitleStyle($PHPSheet, 17);
+        $PHPSheet->setCellValue("A1", "合同号")->setCellValue("B1", "合同签约日期")->setCellValue("C1", "客户单位")->setCellValue("D1", "总价")->setCellValue("E1", "销售人员")->setCellValue("F1", "发货")->setCellValue("G1", "发货比例")->setCellValue("H1", "发票")->setCellValue("I1", "付款金额")->setCellValue("J1", "付款比例")->setCellValue("K1", "付款详情")->setCellValue("L1", "欠款金额")->setCellValue("M1", "尾款到期日")->setCellValue("N1", "是否超期")->setCellValue("O1", "财务后续处理意见")->setCellValue("P1", "销售处理反馈")->setCellValue("Q1", "订单交期日期");
         $PHPSheet->setTitle($name);
-        $data = $this->mod_data->get($where);
+        $data = $this->mod_data->get($where,0,0,['B_htqyrq'=>-1]);
         $i    = 1;
         foreach ($data as $item) {
             $i++;
-            $PHPSheet->setCellValue("A$i", $item['A_hth'])->setCellValue("B$i", date('Y-m-d', $item['B_htqyrq']))->setCellValue("C$i", $item['C_ssxm'])->setCellValue("C$i", $item['D_khdw'])->setCellValue("D$i", $item['E_zj'])->setCellValue("E$i", $item['F_xsry'])->setCellValue("F$i", $item['G_fh'])->setCellValue("G$i", $item['H_fhbl'] . '%')->setCellValue("H$i", $item['I_fp'])->setCellValue("I$i", $item['J_fkje'])->setCellValue("J$i", $item['K_fkbl'] . '%')->setCellValue("K$i", $item['L_fkxq'])->setCellValue("L$i", $item['M_qkje'])->setCellValue("M$i", empty($item['N_wkdqr']) ? '' : date('Y-m-d', $item['N_wkdqr']))->setCellValue("N$i", $item['O_sfcq'])->setCellValue("O$i", $item['P_cwhxclyj'])->setCellValue("P$i", $item['Q_xsclfk']);
+            if (empty($item['B_htqyrq'])) {
+                continue;
+            }
+            $PHPSheet->setCellValue("A$i", $item['A_hth'])->setCellValue("B$i", date('Y-m-d', $item['B_htqyrq']))->setCellValue("C$i", $item['D_khdw'])->setCellValue("D$i", $item['E_zj'])->setCellValue("E$i", $item['F_xsry'])->setCellValue("F$i", $item['G_fh'])->setCellValue("G$i", $item['H_fhbl'] . '%')->setCellValue("H$i", $item['I_fp'])->setCellValue("I$i", $item['J_fkje'])->setCellValue("J$i", $item['K_fkbl'] . '%')->setCellValue("K$i", $item['L_fkxq'])->setCellValue("L$i", $item['M_qkje'])->setCellValue("M$i", empty($item['N_wkdqr']) ? '' : date('Y-m-d', $item['N_wkdqr']))->setCellValue("N$i", $item['O_sfcq'])->setCellValue("O$i", $item['P_cwhxclyj'])->setCellValue("P$i", $item['Q_xsclfk'])->setCellValue("Q$i", date('Y-m-d',$item['T_jqrq']));
         }
         $PHPWriter = \PHPExcel_IOFactory::createWriter($PHPExcel, "Excel2007");
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -672,5 +681,28 @@ class OrderInfo extends Base
     //        $this->mod->update(['errorStatus' => 0], $id);
     //        return json(ok($list));
     //    }
+
+
+    public function addDate()
+    {
+        $order_data = iterator_to_array($this->mod_data->get());
+        //dump($order_data);
+        //return json(ok(count($order_data)));
+        //$i = 0;
+        foreach ($order_data as $item) {
+            if (empty($item['T_jqrq'])) {
+                //$i++;
+                $id = $item['id'];
+                $T_jqrq = strtotime(date('Y-m-d',$item['B_htqyrq']) . ' +5 days');
+                $this->mod_data->update([
+                    'T_jqrq' => $T_jqrq
+                ],$id);
+            }
+        }
+        return json(ok(['total' => count($order_data)]));
+
+    }
+
+
 
 }

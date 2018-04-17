@@ -317,7 +317,8 @@
                         name: self.keyword,
                         userId: self.userInfo.userid || '01275865371232039',
                         type: '',
-                        pn: self.pn
+                        pn: self.pn,
+			isCharge: self.userInfo.isCharge
                     }
                 }).then(function (resp) {
                     //console.log(resp.data.data)
@@ -342,6 +343,7 @@
             ding.ready(function () {
                 ding.getUserInfo(function (resp) {
                     self.userInfo = resp.data;
+                    // alert(self.userInfo.roleName);
                     self.getData();
                 });
             });

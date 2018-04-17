@@ -115,7 +115,8 @@
         flex-wrap: wrap;
 }
 .index .charts .list .item{
-    width: 33.33%;
+    width: 33%;
+    margin-left: 10px;
 }
 .index .charts .list .item{
     display: flex;
@@ -182,20 +183,24 @@
     font-size: .14rem;
     font-weight: bold;
 }
-.index .record .list ,.btn{
+.index .record .btn{
     display: flex;
     flex-wrap: wrap;
+
 }
+/* .index .record .list{
+    
+} */
 .index .record .list .item{
-    width: 48%;
     margin-top: 5px;
     margin-bottom: 5px;
+    margin-left: 10px;
 }
 .index .record .btn .bt-left,
 .bt-right {
     flex: 2;
     height: 30px;
-    margin: 10px 30px 0px 30px;
+    margin: 10px 30px 5px 30px;
     border: none;
     line-height: 30px;
     font-size: .14rem;
@@ -205,19 +210,22 @@
 /* 输入框 */
 .index .record .list .item input{
     height: .3rem;
-    line-height: .3rem;
-    text-indent: .1rem;
+    /* line-height: .3rem;
+    text-indent: .1rem; */
     border: 1px solid #ddd;
     color: #999;
     font-size: .14rem;
+}.index .record .list .item-bt{
+    margin-left: 10px;
 }
-.index .record .list .item-bt input{
-    height: .3rem;
-    line-height: .3rem;
-    text-indent: .1rem;
+.index .record .list .item-bt textarea{
+    height: .8rem;
+    /* line-height: .3rem; */ 
+    /* text-indent: .1rem; */
     border: 1px solid #ddd;
     color: #999;
     font-size: .14rem;
+    vertical-align:middle ;
 }
 /* 文字 */
 .index .record .list .item, .item-bt .txt {
@@ -225,9 +233,9 @@
     font-size: .14rem;
 }
 /* 输入框*/
-.index .record .list .item-bt input{
-    width: 72%;
+.index .record .list .item-bt textarea{
+    width: 320px;
 }
-.index .record .item input{
-    width: 60%;
+.index .record .list .item input{
+    width: 320px;
 }

@@ -96,7 +96,8 @@
                         params: {
                             id: util.getParams('id'),
                             userId: self.userInfo.userid || '01275865371232039',
-                            pn: self.pn
+                            pn: self.pn,
+                            isCharge: self.userInfo.isCharge
                         }
                     }).then(function (resp) {
                         console.log(resp.data.data)

@@ -2,7 +2,6 @@
 namespace app\admin\controller;
 
 use think\Controller;
-use think\Session;
 
 class Base extends Controller
 {
@@ -27,7 +26,6 @@ class Base extends Controller
 //            'power'   => 1,
 //            'setUp'   => 1,
 //        ];
-        /*return session('user');*/
-        return Session::get('user');
+        return session('user');
     }
 }

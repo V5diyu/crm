@@ -17,6 +17,14 @@ class OrderPayDetailDb
         return $this->con->find($where)->fields($fields)->sort($sort)->skip($skip)->limit($limit);
     }
 
+    public function getInfo($where)
+    {
+        if (!is_array($where)) {
+            $where = ['id' => $where];
+        }
+        return $this->con->findOne($where);
+    }
+    
     public function batchInsert($data)
     {
         $this->con->batchInsert($data);

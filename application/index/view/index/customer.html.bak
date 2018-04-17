@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <meta http-equiv="Cache-Control" CONTENT="no-cache">
+    <meta http-equiv="Pragma" CONTENT="no-cache">
+    <title>客户</title>
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_437531_omrlxjrr8e7gy14i.css">
+    <link rel="stylesheet" type="text/css" href="/mobile/iconfont/iconfont1.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+<div class="container customer nav-fixed-bottom" id="app" v-cloak>
+    <div class="header-menu">
+        <span class="menu" :class="{'active': belong == 1}" @click="tab(1)">我的客户</span>
+        <span class="menu" :class="{'active': belong == 2}" @click="tab(2)">客户池</span>
+
+        <div class="icon-action">
+            <!--<i class="iconfont icon-sousuo" @click="searchModel"></i>-->
+            <a class="iconfont icon-tianjiajiahaowubiankuang" href="/index/index/addCustomer"></a>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" v-model="keyword">
+        <i class="iconfont icon-sousuo" @click="search"></i>
+    </div>
+
+    <!--<a class="notice">-->
+    <!--<span class="txt">您也有3位客户两周内未联系</span>-->
+    <!--<span class="link">点击查看</span>-->
+    <!--</a>-->
+
+    <div class="list" v-show="belong == 1">
+        <!--<div class="list has-notice">-->
+        <div class="item" v-for="(item,index) in listData">
+            <a :href="'/index/index/customerDetail?id=' + item.id" class="baseinfo">
+                <div class="title">
+                    <span class="company" style="color: #1295D9;">{{item.name}}</span>
+                    <span class="type">{{item.type}}</span>
+                </div>
+                <!--<div class="name" v-if="item.type == '厂家'">法人: {{item.legalRepresentative}}</div>-->
+                <!--<div class="address">地址: {{item.address}}</div>-->
+                <!--<div class="address">ID: {{item.id}}</div>-->
+            </a>
+            <!--<a :href="'/index/index/salesFunnel?id=' + item.id" class="note" v-if="item.type == '终端'">
+                <div class="left">
+                    <span class="tit">销售漏斗</span>
+                    <span class="txt">阶段: {{item.salesFunnel.stage  || '无'}}</span>
+                </div>
+                <div class="right">
+                    <span class="time">{{item.salesFunnel.time  || '无'}}</span>
+                    <i class="iconfont icon-back_light"></i>
+                </div>
+            </a>-->
+
+            <div class="salesFunnel" v-if="item.type == '终端'">
+                <div class="left">销售漏斗</div>
+
+                <div class="right">
+                    <div class="select" @click="salesFunnel(item)">
+                        <div class="current">
+                            <span class="txt">{{item.salesFunnel}}</span>
+                            <i class="iconfont icon-unfold"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a :href="'/index/index/programme?id=' + item.id" class="note">
+                <div class="left">
+                    <span class="tit">跟踪方案</span>
+                    <span class="txt">内容: {{item.lastProgramme.content  || '无'}}</span>
+                </div>
+                <div class="right">
+                    <span class="time">{{item.lastProgramme.time  || '无'}}</span>
+                    <i class="iconfont icon-back_light"></i>
+                </div>
+            </a>
+
+            <a class="note" :href="'/index/index/communication?id=' + item.id + '&type=1'">
+                <div class="left">
+                    <span class="tit">沟通记录</span>
+                    <span class="txt">阶段: {{item.lastRecord.title || '无'}}</span>
+                </div>
+                <div class="right">
+                    <span class="time">{{item.lastRecord.time || '无'}}</span>
+                    <i class="iconfont icon-back_light"></i>
+                </div>
+            </a>
+
+            <div class="btn-group">
+                <span class="btn-add" @click="addNoticeModal(item)">添加提醒</span>
+                <span class="btn-zhuan" @click="reverseCustomer(item, index)">转回客户池</span>
+            </div>
+        </div>
+
+        <div class="no-data" v-show="isNoData">暂无数据</div>
+    </div>
+
+    <div class="list" v-show="belong == 2">
+        <!--<div class="list has-notice">-->
+        <div class="item" v-for="(item,index) in listData">
+            <a href="javascript:;" class="baseinfo">
+                <div class="title">
+                    <span class="company" style="color: #1295D9;">{{item.name}}</span>
+                    <span class="type">{{item.type}}</span>
+                </div>
+                <!--<div class="name" v-if="item.type == '厂家'">法人: {{item.legalRepresentative}}</div>-->
+                <!--<div class="address">地址: {{item.address}}</div>-->
+            </a>
+
+            <div class="btn-group">
+                <span class="btn-add" @click="want(item)">{{item.applyNum == 0 ? '我要跟进' : item.applyNum + '人已抢'}}</span>
+            </div>
+        </div>
+
+        <div class="no-data" v-show="isNoData">暂无数据</div>
+    </div>
+
+
+    <div class="ui-shade" v-show="addNoticeState"></div>
+
+    <div class="ui-popup" v-show="addNoticeState">
+        <div class="date">
+            <div class="text" @click="datepicker">{{notice.time}}</div>
+            <i class="iconfont icon-calendar"></i>
+        </div>
+        <textarea placeholder="提醒内容" v-model="notice.content"></textarea>
+
+        <div class="btn-group">
+            <span class="cannel" @click="addNoticeModal">取消</span>
+            <span class="sure" @click="addNotice">确定</span>
+        </div>
+    </div>
+
+    <div class="nav" v-if="userInfo.userid">
+        <a class="nav-item " href="/index/index">
+            <i class="iconfont icon-gongzuotai1"></i>
+            <p>工作台</p>
+        </a>
+        <a class="nav-item" href="/index/index/order">
+            <i class="iconfont icon-zichanxinxibuquancelve"></i>
+            <p>订单查询</p>
+        </a>
+        <a class="nav-item" href="/index/index/lend">
+            <i class="iconfont icon-jihua"></i>
+            <p>借用查询</p>
+        </a>
+        <a class="nav-item nav-active" href="/index/index/customer">
+            <i class="iconfont icon-category"></i>
+            <p>客户</p>
+        </a>
+        <!--<a class="nav-item" href="/index/index/agent">
+            <i class="iconfont icon-dailishangguanli"></i>
+            <p>代理商</p>
+        </a>-->
+        <a v-if="userInfo.roleName === '主管'" href="/index/index/customerRecord" class="nav-item">
+            <i class="iconfont icon-chanpin"></i>
+            <p>沟通记录</p>
+        </a>
+    </div>
+</div>
+
+<script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
+<script src="/static/js/dingding.js"></script>
+<script src="/static/js/util.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            isNoData: false,
+            userInfo: {},
+            keyword: '',
+            pn: 1,
+            listData: [],
+            isHasNext: true,
+            isLoading: false,
+            belong: 1,// 1:我的客户 2：客户池
+            searchBoxState: false,
+            addNoticeState: false,
+            notice: {
+                time: '日期',
+                content: ''
+            },
+            options: [
+                {
+                    key: '初步接触',
+                    value: '初步接触'
+                },{
+                    key: '有兴趣',
+                    value: '有兴趣'
+                },{
+                    key: '询问价格',
+                    value: '询问价格'
+                },{
+                    key: '提交方案',
+                    value: '提交方案'
+                },{
+                    key: '下订单',
+                    value: '下订单'
+                },{
+                    key: '成交',
+                    value: '成交'
+                },{
+                    key: '丢单',
+                    value: '丢单'
+                }
+            ],
+            curItem: {}
+        },
+        methods: {
+            salesFunnel: function(item){
+                var self = this;
+                self.curItem = item;
+                dd.biz.util.chosen({
+                    source: self.options,
+                    selectedKey: item.salesFunnel, // 默认选中的key
+                    onSuccess : function(result) {
+                        item.salesFunnel = result.value;
+                        self.updateSalesFunnel();
+                    },
+                    onFail : function(err) {}
+                });
+            },
+            updateSalesFunnel: function(){
+                var self = this;
+                ajax.post('/api/customer/updateSalesFunnel', {
+                    id: self.curItem.id,
+                    salesFunnel: self.curItem.salesFunnel
+                }, function (resp) {
+                    ding.toast('漏斗阶段修改成功');
+                })
+            },
+            want: function (row) {
+                var self = this;
+                ajax.post('/api/customer/operationApply', {
+                    userId: self.userInfo.userid,
+                    userName: self.userInfo.name,
+                    id: row.id
+                }, function (resp) {
+                    row.applyNum += 1;
+                    ding.toast('申请跟进成功');
+                })
+            },
+            tab: function (val) {
+                this.isNoData = false;
+                this.belong = val;
+                this.pn = 1;
+                this.keyword = '';
+                this.listData = [];
+                this.isHasNext = true;
+                this.isLoading = false;
+                this.getData();
+            },
+            addNoticeModal: function (row) {
+                this.addNoticeState = !this.addNoticeState;
+                this.curNoticeItem = row;
+            },
+            addNotice: function () {
+                var self = this;
+                ajax.post('/api/remind/create', {
+                    userId: self.userInfo.userid,
+                    type: 2,  //2:客户  3：代理商
+                    objId: self.curNoticeItem.id,
+                    time: self.notice.time,
+                    content: self.notice.content
+                }, function (resp) {
+                    self.addNoticeModal();
+                    ding.toast('添加提醒成功');
+                })
+            },
+            reverseCustomer: function (row, index) {
+                var self = this;
+                ding.confirm(function (resp) {
+                    if (resp.buttonIndex == 0) {
+                        ajax.post('/api/customer/operationTransfer', {
+                            id: row.id,
+                            userId: self.userInfo.userid
+                        }, function (resp) {
+                            ding.toast('转回客户池成功');
+                            self.listData.splice(index, 1);
+                        })
+                    }
+                }, '确定转回客户池')
+            },
+            searchModel: function () {
+                this.searchBoxState = !this.searchBoxState;
+            },
+            datepicker: function () {
+                var self = this;
+                ding.datepicker(function (resp) {
+                    self.notice.time = resp.value;
+                })
+            },
+            search: function () {
+                this.pn = 1;
+                this.isHasNext = true;
+                this.isLoading = false;
+                this.listData = [];
+                this.getData();
+            },
+            getData: function () {
+                var self = this;
+                ding.showLoading();
+
+                axios.get('/api/customer/get', {
+                    params: {
+                        belong: self.belong, // 1:我的客户 2：客户池
+                        name: self.keyword,
+                        userId: self.userInfo.userid || '01275865371232039',
+                        type: '',
+                        pn: self.pn
+                    }
+                }).then(function (resp) {
+                    //console.log(resp.data.data)
+                    ding.hideLoading();
+                    resp.data.data.forEach(function(item){
+                        item.key = '初步接触';
+                    });
+                    if (resp.data.data.length < 15) {
+                        self.isHasNext = false;
+                    }
+                    self.listData = self.listData.concat(resp.data.data);
+
+                    if (self.listData.length === 0) {
+                        self.isNoData = true;
+                    }
+                })
+            }
+        },
+        created: function () {
+            var self = this;
+
+            ding.ready(function () {
+                ding.getUserInfo(function (resp) {
+                    self.userInfo = resp.data;
+                    self.getData();
+                });
+            });
+//                self.getData();
+
+            this.$nextTick(function () {
+                util.loadMore(function () {
+                    if (!self.isHasNext) {
+                        ding.toast('没有更多数据', 2);
+                        return;
+                    }
+                    if (self.isLoading) {
+                        return;
+                    }
+                    self.pn += 1;
+                    self.getData();
+                })
+            })
+        }
+    });
+
+</script>
+</body>
+</html>

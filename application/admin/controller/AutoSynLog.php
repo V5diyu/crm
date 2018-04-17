@@ -27,7 +27,6 @@ class AutoSynLog extends Base
         $where = [];
         $sort = ['syn_timestamp'=> -1];
         if (!empty($search)) {
-            /*$where['$eq'] = ['flag' => ['$regex' => $search, '$options' => 'i']];*/
             $where['flag'] = $search;
         }
 
@@ -56,29 +55,6 @@ class AutoSynLog extends Base
         return json(ok(['list'=>$list,'count'=>$count]));
     }
 
-    /*public function get ()
-    {
-        //$search = input('');
-        $pn    = input('pn', 1);
-        $ps    = 15;
-        $start = ($pn - 1) * $ps;
-        $where = [];
-
-        if (!empty($search)) {
-            $where[''] = [];
-        }
-
-        $data = $this->mod_autoSynLog->get($where, $start, $ps);
-        $count = $this->mod_autoSynLog->count($where);
-
-        $list = [];
-        foreach ($data as $key => $item) {
-            $item['syn_time'] = date('Y-m-d H:i:s',$item['syn_timestamp']);
-            $list[] = $item;
-        }
-        return json(ok(['list'=>$list,'count'=>$count]));
-    }*/
-
     public function getInfo ()
     {
 
@@ -105,7 +81,7 @@ class AutoSynLog extends Base
         }
         $PHPExcel = new \PHPExcel();
         $PHPSheet = $PHPExcel->getActiveSheet();
-        $name     = '自动同步日志_' . date('Y-m-d');
+        $name     = '自动同步日志_' . date('Y-m-d-H-i-s');
         setExcelTitleStyle($PHPSheet,5);
         $PHPSheet->setCellValue("A1", "同步时间")->setCellValue("B1", "数据表")->setCellValue("C1", "同步内容")->setCellValue("D1", "标记ID")->setCellValue("E1", "操作类型");
         $PHPSheet->setTitle($name);
@@ -120,6 +96,5 @@ class AutoSynLog extends Base
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=$name.xlsx");
         $PHPWriter->save("php://output");
-
     }
 }

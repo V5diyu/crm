@@ -32,21 +32,21 @@
                         <span class="row-left">item.id</span>
                         <span class="row-right">{{item.id}}</span>
                     </div>-->
-                    <div class="row">
+                    <!-- <div class="row">
                         <span class="row-left">标题</span>
                         <span class="row-right">{{item.title}}</span>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <span class="row-left">销售人员</span>
                         <span class="row-right">{{item.userName}}</span>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <span class="row-left">沟通对象</span>
                         <span class="row-right">{{item.customerName}}</span>
-                    </div>
-                    <div class="row">
+                    </div> -->
+                    <div class="row-bts">
                         <span class="row-left">内容</span>
-                        <span class="row-right">{{item.remark}}</span>
+                        <span class="row-r">{{item.remark}}</span>
                     </div>
                 </div>
             <!--</a>-->
@@ -110,9 +110,9 @@
 
                     axios.get('/api/customer/getRecordList', {
                         params: {
-                            pn      :   self.pn,
-                            isCharge:   self.userInfo.isCharge,
-                            userName:   self.userInfo.name
+                            pn: self.pn,
+                            isCharge: self.userInfo.isCharge,
+                            userName: self.userInfo.name
                         }
                     }).then(function (resp) {
                         //ding.hideLoading();
@@ -129,11 +129,10 @@
             },
             created: function(){
                 var self = this;
-
                 ding.ready(function(){
                     ding.getUserInfo(function(resp){
                         self.userInfo = resp.data;
-                        //alert(self.userInfo.roleName);
+                        // alert(self.userInfo.roleName);
                         self.getData();
                     });
                 });

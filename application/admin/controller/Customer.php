@@ -595,26 +595,26 @@ class Customer extends Base
             $id = $record_item['id'];
             $type = 1;
 
-            $this->mod_record->update([
+            /*$this->mod_record->update([
                 'type' => $type
-            ],$id);
+            ],$id);*/
         }
     }
 
     public function updateCustomer ()
     {
-        /*$customer_data = $this->mod->get();
+        $customer_data = $this->mod->get();
 
         $proxyLevel = '';
         $flag       = 'customer';
 
         foreach ($customer_data as $customer_item) {
             $id = $customer_item['id'];
-            $this->mod->update([
+            /*$this->mod->update([
                 'proxyLevel'    => $proxyLevel,
                 'flag'          => $flag,
-            ],$id);
-        }*/
+            ],$id);*/
+        }
     }
 
     public function mergeTable()
@@ -636,6 +636,7 @@ class Customer extends Base
             $agent_item['province']             = '';
             $agent_item['salesFunnel']          = '';
             $agent_item['stage']                = '';
+            $agent_item['flag']                 = 'agent';
 
             $list_agent_data[] = $agent_item;
         }
@@ -655,13 +656,11 @@ class Customer extends Base
             $list_record_data[] = $record_item;
 
         }
-
         //dump(count($list_record_data));
-        if (!empty($list_record_data) ) {
+        /*if (!empty($list_record_data) ) {
             dump(count($list_record_data));
-            //$this->mod_record->batchInsert($list_record_data);
-        }
-
+            $this->mod_record->batchInsert($list_record_data);
+        }*/
     }
 
 }

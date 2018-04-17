@@ -223,6 +223,7 @@ if (!empty($ret_1)) {
             'Q_xsclfk'   => '',                                             //销售处理反馈
             'R_zsdsl'    => '',                                             //总受订数量
             'S_zxhsl'    => 0,                                              //总销货数量
+            'T_jqrq'     => isset($v['contractTime']) ? strtotime(date('Y-m-d',strtotime($v['contractTime'])) . '+5 days') : strtotime(date('Y-m-d',$original_data[0]['B_htqyrq']) . '+5 days') , 
             'company'    => 'TK01'                                          //company
 
         ];

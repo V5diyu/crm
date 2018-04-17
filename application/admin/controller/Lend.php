@@ -88,8 +88,6 @@ class Lend extends Base
 
         $D_zj       = input('D_zj');            //总价计算
 
-
-
         if (empty($id) || empty($A_hth) || empty($B_jcrq)) {
             return json(error('缺少必要参数'));
         }
@@ -98,9 +96,9 @@ class Lend extends Base
             'F_khmc'     => $F_khmc,            //客户单位
             'G_jysl'     => $G_jysl,            //总价
             'H_ghsl'     => $H_ghsl,            //销售人员
-            'I_jcsj'     => $I_jcsj,            //发货
-            'J_ghsj'     => $J_ghsj,            //发货比例
-            'K_dqsj'     => $K_dqsj,            //发票
+            'I_jcsj'     => strtotime($I_jcsj),            //发货
+            'J_ghsj'     => strtotime($J_ghsj),            //
+            'K_dqsj'     => strtotime($K_dqsj),            //
         ];
 
         $this->mod_lend->update($setData,$id);

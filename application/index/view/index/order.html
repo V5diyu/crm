@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
@@ -12,6 +13,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/common.css">
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
 </head>
+
 <body>
     <div class="container productTime" id="app" v-cloak>
         <div class="search">
@@ -34,30 +36,78 @@
                     <span class="right">{{item.A_hth}}</span>
                 </div>
                 <div class="content">
+                    <div class="row-bt">
+                        <span class="row-left-l">总价</span>
+                        <span class="row-right-r">{{item.E_zj}}</span>
+
+                    </div>
+                    <div class="row-bt">
+                        <span class="row-left-l">销售人员</span>
+                        <span class="row-right-r">{{item.F_xsry}}</span>
+                    </div>
+
+                    <div class="row-bt">
+                        <span class="row-left-l">付款金额</span>
+                        <span class="row-right-r">{{item.E_zj}}</span>
+                    </div>
+                    <div class="row-bt">
+                        <span class="row-left-l">尾款到期日</span>
+                        <span class="row-right-r">{{item.N_wkdqr}}</span>
+                    </div>
+                    <div class="row-bt">
+                        <span class="row-left-l">发货比例</span>
+                        <span class="row-right-r">{{item.H_fhbl}}</span>
+                    </div>
+                    <div class="row-bt">
+                        <span class="row-left-l">交期时间</span>
+                        <span class="row-right-r">{{item.T_jqrq}}</span>
+                    </div>
+                    <!-- 我的 -->
+                    <!-- <div class="row">
+                        <span class="row-left">总价</span>
+                        <span class="row-right">{{item.E_zj}}</span>
+                        <span class="row-left">销售人员</span>
+                        <span class="row-right">{{item.E_zj}}</span>
+                    </div>
+                    <div class="row">
+                        <span class="row-left">付款金额</span>
+                        <span class="row-right">{{item.J_fkje}}</span>
+                        <span class="row-left">尾款到期日</span>
+                        <span class="row-right">{{item.N_wkdqr}}</span>
+                    </div>
+                    <div class="row">
+                        <span class="row-left">发货比例</span>
+                        <span class="row-right">{{item.H_fhbl}}</span>
+                        <span class="row-left">交期时间</span>
+                        <span class="row-right">{{item.H_fhbl}}</span>
+                    </div> -->
+
+
+                    <!-- 以前的代码 -->
                     <!--<div class="row">
                         <span class="row-left">所属项目</span>
                         <span class="row-right">{{item.C_ssxm}}</span>
                     </div>-->
-                    <div class="row">
+                    <!-- <div class="row">
                         <span class="row-left">总价</span>
                         <span class="row-right">{{item.E_zj}}</span>
                     </div>
                     <div class="row">
                         <span class="row-left">付款金额</span>
                         <span class="row-right">{{item.J_fkje}}</span>
-                    </div>
+                    </div> -->
                     <!--<div class="row">
                         <span class="row-left">付款比例</span>
                         <span class="row-right">{{item.K_fkbl}}</span>
                     </div>-->
-                    <div class="row">
+                    <!-- <div class="row">
                         <span class="row-left">发货比例</span>
                         <span class="row-right">{{item.H_fhbl}}</span>
                     </div>
                     <div class="row">
                         <span class="row-left">尾款到期日</span>
                         <span class="row-right">{{item.N_wkdqr}}</span>
-                    </div>
+                    </div> -->
                 </div>
             </a>
         </div>
@@ -71,8 +121,10 @@
 
     <script src="/static/js/dingding.js"></script>
     <script src="/static/js/util.js"></script>
-    <!--<script src="/mobile/lib/ydui/ydui.js"></script>  -->              <!--组件类库-->
-    <!--<script src="/mobile/lib/ydui/ydui.flexible.js"></script> -->      <!--自适应类库-->
+    <!--<script src="/mobile/lib/ydui/ydui.js"></script>  -->
+    <!--组件类库-->
+    <!--<script src="/mobile/lib/ydui/ydui.flexible.js"></script> -->
+    <!--自适应类库-->
 
     <script>
 
@@ -81,22 +133,22 @@
             data: {
                 isNoData: false,
                 userInfo: {},
-                keyword : '',
-                pn      : 1,
-                order   : 1,
+                keyword: '',
+                pn: 1,
+                order: 1,
                 listData: [],
                 isHasNext: true,
                 isLoading: false
             },
             methods: {
-                search: function(){
+                search: function () {
                     this.pn = 1;
                     this.isHasNext = true;
                     this.isLoading = false;
                     this.listData = [];
                     this.getData();
                 },
-                getData: function(){
+                getData: function () {
                     var self = this;
                     ding.showLoading();
                     axios.get('/api/order_info/get', {
@@ -127,19 +179,19 @@
                     self.getData();
                 }
             },
-            created: function(){
+            created: function () {
                 var self = this;
 
-                ding.ready(function(){
-                    ding.getUserInfo(function(resp){
+                ding.ready(function () {
+                    ding.getUserInfo(function (resp) {
                         self.userInfo = resp.data;
                         self.getData();
                         //alert(resp.data.isCharge);
                     });
                 });
 
-                this.$nextTick(function(){
-                    util.loadMore(function(){
+                this.$nextTick(function () {
+                    util.loadMore(function () {
                         if (!self.isHasNext) {
                             ding.toast('没有更多数据', 2);
                             return;
@@ -155,4 +207,5 @@
         })
     </script>
 </body>
+
 </html>

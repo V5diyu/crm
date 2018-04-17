@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
@@ -14,10 +15,10 @@
     <link rel="stylesheet" type="text/css" href="/mobile/lib/ydui/ydui.rem.css">
 
     <style>
-
-        [v-cloak]{
+        [v-cloak] {
             display: none;
         }
+
         .ui-title {
             color: #666666;
             font-size: 30px;
@@ -25,38 +26,124 @@
             text-align: center;
         }
 
-        .project-detail .list-group{
-            padding: .1rem;
+        .project-detail .list-group {
+            padding: 5px 10px;
         }
-        .project-detail .list-group .list-item{
+
+        /* 交期信息 */
+
+        .project-detail .list-group .list-item-bt {
+            display: flex;
+            display: inline-block;
+            flex-wrap: wrap;
+            width: 48%;
+            /* padding: 5px 15px; */
+            height: 100%;
+            /* line-height: .6rem; */
+            padding: 0 .05rem;
+            /* background-color: #f5f5f5; */
+            border-bottom: 1px dashed #e8e8e8;
+            padding: 5px 0px 5px 0px;
+        }
+
+        .project-detail .list-group .list-item-bt .left {
+            flex: 1;
+            color: #000;
+            font-size: 16px;
+        }
+
+        .project-detail .list-group .list-item-bt .right {
+            color: #000;
+            font-size: 16px;
+        }
+
+        .project-detail .list-group .list-item-s {
+            display: flex;
+            display: inline-block;
+            flex-wrap: wrap;
+            width: 26%;
+            /* padding: 5px 15px; */
+            height: 100%;
+            /* line-height: .6rem; */
+            padding: 0 .05rem;
+            /* background-color: #f5f5f5; */
+            border-bottom: 1px dashed #e8e8e8;
+            padding: 5px 0px 5px 0px;
+        }
+
+        .project-detail .list-group .list-item-s .left {
+            flex: 1;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .project-detail .list-group .list-item-s .right {
+            float: right;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .project-detail .list-group .list-item-p {
+            display: flex;
+            display: inline-block;
+            flex-wrap: wrap;
+            width: 70%;
+            /* padding: 5px 15px; */
+            height: 100%;
+            /* line-height: .6rem; */
+            padding: 0 .05rem;
+            /* background-color: #f5f5f5; */
+            border-bottom: 1px dashed #e8e8e8;
+            padding: 5px 0px 5px 0px;
+            margin-right: 5px;
+        }
+
+        .project-detail .list-group .list-item-p .left {
+
+            color: #999;
+            font-size: 14px;
+        }
+
+        .project-detail .list-group .list-item-p .right {
+            float: right;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .project-detail .list-group .list-item {
             display: flex;
             line-height: .6rem;
             padding: 0 .05rem;
             background-color: #f5f5f5;
             border-bottom: 1px dashed #e8e8e8;
         }
-        .project-detail .list-group .list-item .left{
+
+        .project-detail .list-group .list-item .left {
             width: 80px;
         }
-        .project-detail .list-group .list-item .right{
+
+        .project-detail .list-group .list-item .right {
             text-align: right;
             flex: 1;
             word-break: normal;
         }
 
-        .project-detail .rules-title{
+        .project-detail .rules-title {
             padding: 10px 15px;
             font-size: 16px;
             font-weight: 500;
         }
-        .project-detail .project-flow .iconfont{
+
+        .project-detail .project-flow .iconfont {
             color: #0bb20c;
             font-size: .44rem;
         }
-        .project-detail .project-flow .icon-gantanhao{
+
+        .project-detail .project-flow .icon-gantanhao {
             color: #ef4f4f;
         }
-        .project-detail .project-flow .icon-shijian{
+
+        .project-detail .project-flow .icon-shijian {
             color: #ffb400;
         }
     </style>
@@ -65,6 +152,7 @@
 
 
 </head>
+
 <body>
     <div class="project-detail" id="app" v-cloak>
 
@@ -217,10 +305,10 @@
                 <div slot="left">合同号</div>
                 <div slot="right">{{order.A_hth}}</div>
             </yd-preview-header>
-            <yd-preview-item>
+            <!-- <yd-preview-item>
                 <div slot="left">所属项目</div>
                 <div slot="right">{{order.C_ssxm}}</div>
-            </yd-preview-item>
+            </yd-preview-item> -->
             <yd-preview-item>
                 <div slot="left">客户单位</div>
                 <div slot="right">{{order.D_khdw}}</div>
@@ -241,10 +329,10 @@
                 <div slot="left">发货比例</div>
                 <div slot="right">{{order.H_fhbl}}</div>
             </yd-preview-item>
-            <!--<yd-preview-item>
+            <yd-preview-item>
                 <div slot="left">交期时间</div>
-                <div slot="right"></div>
-            </yd-preview-item>-->
+                <div slot="right">{{order.T_jqrq}}</div>
+            </yd-preview-item>
             <yd-preview-item>
                 <div slot="left">发票</div>
                 <div slot="right">{{order.I_fp}}</div>
@@ -257,10 +345,10 @@
                 <div slot="left">付款比例</div>
                 <div slot="right">{{order.K_fkbl}}</div>
             </yd-preview-item>
-            <yd-preview-item>
+            <!-- <yd-preview-item>
                 <div slot="left">付款详情</div>
                 <div slot="right">{{order.L_fkxq}}</div>
-            </yd-preview-item>
+            </yd-preview-item> -->
             <yd-preview-item>
                 <div slot="left">欠款金额</div>
                 <div slot="right">{{order.M_qkje}}</div>
@@ -278,7 +366,29 @@
         <yd-accordion style="margin-top: 5px;">
             <yd-accordion-item title="交期信息">
                 <div class="list-group" v-for="(item, index) in productDetail">
-                    <div class="list-item">
+                    <div class="list-item-bt">
+                        <span class="left">{{item.D_dh}}</span>
+                    </div>
+                    <div class="list-item-bt">
+                        <span class="right">{{item.I_ckrq}}</span>
+                    </div>
+                    <div class="list-item-p">
+                        <span class="left">品号</span>
+                        <span class="right">{{item.E_ph}}</span>
+                    </div>
+                    <div class="list-item-s">
+                            <span class="left">数量</span>
+                            <span class="right">{{item.J_sl}}</span>
+                        </div>
+                    <div class="list-item-p">
+                        <span class="left">品名</span>
+                        <span class="right">{{item.F_pm}}</span>
+                    </div>
+                    <div class="list-item-s">
+                        <span class="left">销货数量</span>
+                        <span class="right">{{item.K_xhsl}}</span>
+                    </div>
+                    <!-- <div class="list-item">
                         <div class="left">交期单</div>
                         <div class="right">{{item.D_dh}}</div>
                     </div>
@@ -309,7 +419,7 @@
                     <div class="list-item">
                         <div class="left">预计发货时间</div>
                         <div class="right">{{item.N_yjfhrq}}</div>
-                    </div>
+                    </div> -->
                 </div>
             </yd-accordion-item>
 
@@ -331,7 +441,7 @@
             </yd-accordion-item>
 
             <yd-accordion-item title="付款信息">
-                <div class="list-group" v-for="(item, index) in payDetail" >
+                <div class="list-group" v-for="(item, index) in payDetail">
                     <div class="list-item">
                         <div class="left">付款金额</div>
                         <div class="right">{{item.payment}}</div>
@@ -345,13 +455,15 @@
         </yd-accordion>
 
         <!--<div class="btn-error-box">-->
-        	<!--<div class="btn-error" @click="correctError">我要纠错</div>-->
+        <!--<div class="btn-error" @click="correctError">我要纠错</div>-->
         <!--</div>-->
     </div>
 
     <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
-    <script src="/mobile/lib/ydui/ydui.flexible.js"></script>       <!--自适应类库-->
-    <script src="/mobile/lib/ydui/ydui.js"></script>                <!--组件类库-->
+    <script src="/mobile/lib/ydui/ydui.flexible.js"></script>
+    <!--自适应类库-->
+    <script src="/mobile/lib/ydui/ydui.js"></script>
+    <!--组件类库-->
     <script src="http://g.alicdn.com/dingding/open-develop/1.6.9/dingtalk.js"></script>
     <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js"></script>
     <script src="https://cdn.bootcss.com/qs/6.5.1/qs.min.js"></script>
@@ -364,12 +476,12 @@
             data: {
                 userInfo: {},
                 order: {},
-                productDetail:{},
-                payDetail:{},
-                billDetail:{},
-                billDetailVisible:false,
-                payDetailVisible:false,
-                proDetailVisible:false
+                productDetail: {},
+                payDetail: {},
+                billDetail: {},
+                billDetailVisible: false,
+                payDetailVisible: false,
+                proDetailVisible: false
             },
             methods: {
                 correctError: function () {
@@ -392,7 +504,7 @@
                             }).then(function (resp) {
                                 if (resp.data.ret) {
                                     ding.toast('纠错信息提交成功')
-                                }else{
+                                } else {
                                     ding.toast(resp.data.msg);
                                 }
 
@@ -460,4 +572,5 @@
         });
     </script>
 </body>
+
 </html>
